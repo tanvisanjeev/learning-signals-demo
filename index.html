@@ -1,890 +1,874 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.7">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Learning Signals - Transcript Analysis Demo</title>
+  <style>
+    :root{
+      --bg:#0a0e17;
+      --card:#141d2e;
+      --text:#e9eefc;
+      --muted:#98a7c8;
+      --border:rgba(255,255,255,.12);
+      --accent:#7c5cff;
+      --accent2:#2ee59d;
+      --accent3:#ff6b9d;
+      --shadow:0 20px 60px rgba(0,0,0,.4);
+      --radius:20px;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --mono: "SF Mono", Monaco, Consolas, monospace;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1400px 900px at 10% 0%, #1a2540 0%, var(--bg) 60%),
+        radial-gradient(1000px 800px at 95% 25%, #1d2a42 0%, var(--bg) 65%);
+      min-height:100vh;
+      padding:24px 0;
+    }
+    .wrap{max-width:1400px;margin:0 auto;padding:0 24px;}
+    
+    .header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:32px;
+      padding:20px 28px;
+      background:linear-gradient(135deg, rgba(124,92,255,.15), rgba(46,229,157,.10));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      backdrop-filter:blur(10px);
+    }
+    .logo h1{font-size:24px;margin:0;letter-spacing:-.3px}
+    .logo p{color:var(--muted);font-size:14px;margin-top:4px}
+    .badge{
+      padding:8px 16px;
+      background:rgba(124,92,255,.2);
+      border:1px solid rgba(124,92,255,.4);
+      border-radius:999px;
+      font-size:13px;
+      font-weight:600;
+      color:#d9d2ff;
+    }
+
+    .main{display:grid;grid-template-columns:350px 1fr;gap:24px;margin-bottom:24px}
+    @media(max-width:1200px){ .main{grid-template-columns:1fr} }
+    
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      border-radius:var(--radius);
+      padding:24px;
+    }
+
+    .section-title{
+      font-size:18px;
+      margin:0 0 20px;
+      padding-bottom:12px;
+      border-bottom:1px solid var(--border);
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    label{
+      display:block;
+      color:var(--muted);
+      font-size:13px;
+      font-weight:600;
+      margin:16px 0 8px;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+    }
+
+    .btn{
+      width:100%;
+      padding:14px 20px;
+      margin-top:12px;
+      border:none;
+      border-radius:14px;
+      font-weight:700;
+      font-size:14px;
+      cursor:pointer;
+      transition:all .3s;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+    }
+    .btn-primary{
+      background:linear-gradient(135deg, #7c5cff, #9d7cff);
+      color:white;
+      box-shadow:0 12px 35px rgba(124,92,255,.3);
+    }
+    .btn-primary:hover:not(:disabled){
+      transform:translateY(-2px);
+      box-shadow:0 16px 45px rgba(124,92,255,.4);
+    }
+    .btn-secondary{
+      background:linear-gradient(135deg, #2ee59d, #1bb88a);
+      color:white;
+      box-shadow:0 12px 35px rgba(46,229,157,.3);
+    }
+    .btn-secondary:hover:not(:disabled){
+      transform:translateY(-2px);
+      box-shadow:0 16px 45px rgba(46,229,157,.4);
+    }
+    .btn:disabled{
+      opacity:.4;
+      cursor:not-allowed;
+    }
+
+    .status{
+      margin-top:16px;
+      padding:12px 16px;
+      border-radius:12px;
+      background:rgba(46,229,157,.1);
+      border:1px solid rgba(46,229,157,.3);
+      color:#a3f5d9;
+      font-size:13px;
+      line-height:1.5;
+    }
+    .status.error{
+      background:rgba(255,107,157,.1);
+      border:1px solid rgba(255,107,157,.3);
+      color:#ffb8d2;
+    }
+
+    .kpi-grid{
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      gap:12px;
+      margin-bottom:24px;
+    }
+    .kpi-box{
+      padding:20px;
+      background:rgba(0,0,0,.25);
+      border:1px solid var(--border);
+      border-radius:16px;
+      text-align:center;
+    }
+    .kpi-num{
+      font-size:32px;
+      font-weight:800;
+      background:linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .kpi-label{
+      color:var(--muted);
+      font-size:12px;
+      margin-top:8px;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+    }
+
+    .tabs{
+      display:flex;
+      gap:8px;
+      margin-bottom:20px;
+      border-bottom:1px solid var(--border);
+    }
+    .tab{
+      padding:10px 20px;
+      background:transparent;
+      border:none;
+      color:var(--muted);
+      cursor:pointer;
+      border-bottom:2px solid transparent;
+      transition:all .2s;
+      font-size:14px;
+      font-weight:600;
+    }
+    .tab.active{
+      color:var(--text);
+      border-bottom-color:var(--accent);
+    }
+    .tab-content{display:none}
+    .tab-content.active{display:block}
+
+    .transcript-list{
+      max-height:400px;
+      overflow-y:auto;
+    }
+    .transcript-item{
+      padding:14px;
+      background:rgba(0,0,0,.2);
+      border:1px solid var(--border);
+      border-radius:12px;
+      margin-bottom:10px;
+    }
+    .transcript-name{
+      font-weight:600;
+      font-size:14px;
+      color:var(--text);
+      margin-bottom:4px;
+    }
+    .transcript-preview{
+      font-size:12px;
+      color:var(--muted);
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .transcript-meta{
+      display:flex;
+      justify-content:space-between;
+      margin-top:8px;
+      font-size:11px;
+      color:var(--muted);
+    }
+
+    .pattern-card{
+      padding:20px;
+      background:rgba(0,0,0,.2);
+      border:1px solid var(--border);
+      border-radius:16px;
+      margin-bottom:16px;
+    }
+    .pattern-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:12px;
+    }
+    .pattern-title{
+      font-size:16px;
+      font-weight:700;
+      color:var(--accent2);
+    }
+    .pattern-count{
+      font-size:12px;
+      color:var(--muted);
+      background:rgba(255,255,255,.05);
+      padding:4px 10px;
+      border-radius:999px;
+    }
+    .keywords{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin:12px 0;
+    }
+    .keyword{
+      padding:6px 12px;
+      background:rgba(124,92,255,.15);
+      border:1px solid rgba(124,92,255,.3);
+      border-radius:999px;
+      font-size:12px;
+      font-family:var(--mono);
+      color:#c5b3ff;
+    }
+
+    .ai-insight{
+      margin-top:16px;
+      padding:16px;
+      background:linear-gradient(135deg, rgba(124,92,255,.1), rgba(46,229,157,.08));
+      border-left:3px solid var(--accent);
+      border-radius:10px;
+    }
+    .ai-insight-header{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      color:var(--accent);
+      font-weight:700;
+      margin-bottom:8px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .ai-insight-content{
+      color:var(--text);
+      line-height:1.6;
+      font-size:14px;
+    }
+
+    .quote{
+      margin-top:12px;
+      padding:14px;
+      background:rgba(46,229,157,.08);
+      border-left:3px solid var(--accent2);
+      border-radius:10px;
+      font-size:13px;
+      line-height:1.6;
+      font-style:italic;
+      color:var(--muted);
+    }
+
+    .loading{
+      text-align:center;
+      padding:40px;
+      color:var(--muted);
+    }
+    .spinner{
+      border:3px solid rgba(124,92,255,.2);
+      border-top:3px solid var(--accent);
+      border-radius:50%;
+      width:40px;
+      height:40px;
+      animation:spin 1s linear infinite;
+      margin:0 auto 16px;
+    }
+    @keyframes spin{
+      0%{transform:rotate(0deg)}
+      100%{transform:rotate(360deg)}
+    }
+
+    .empty-state{
+      text-align:center;
+      padding:60px 20px;
+      color:var(--muted);
+    }
+
+    .file-drop-zone{
+      border:2px dashed var(--border);
+      border-radius:12px;
+      padding:30px;
+      text-align:center;
+      margin:16px 0;
+      cursor:pointer;
+      transition:all .2s;
+    }
+    .file-drop-zone:hover{
+      border-color:var(--accent);
+      background:rgba(124,92,255,.05);
+    }
+
+    .info-box{
+      margin-top:20px;
+      padding:16px;
+      background:rgba(124,92,255,.1);
+      border:1px solid rgba(124,92,255,.25);
+      border-radius:14px;
+      font-size:13px;
+      line-height:1.6;
+      color:var(--muted);
+    }
+    .info-box strong{color:var(--text)}
   </style>
 </head>
 <body>
-<p class="p1">&lt;!doctype html&gt;</p>
-<p class="p1">&lt;html lang="en"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="utf-8"/&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width,initial-scale=1"/&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Learning Signals - Transcript Analysis Demo&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>:root{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--bg:#0a0e17;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--card:#141d2e;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--text:#e9eefc;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--muted:#98a7c8;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--border:rgba(255,255,255,.12);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--accent:#7c5cff;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--accent2:#2ee59d;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--accent3:#ff6b9d;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--shadow:0 20px 60px rgba(0,0,0,.4);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--radius:20px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--mono: "SF Mono", Monaco, Consolas, monospace;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>*{box-sizing:border-box;margin:0;padding:0}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>body{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family:var(--sans);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:var(--text);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background:</p>
-<p class="p1"><span class="Apple-converted-space">        </span>radial-gradient(1400px 900px at 10% 0%, #1a2540 0%, var(--bg) 60%),</p>
-<p class="p1"><span class="Apple-converted-space">        </span>radial-gradient(1000px 800px at 95% 25%, #1d2a42 0%, var(--bg) 65%);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>min-height:100vh;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding:24px 0;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.wrap{max-width:1400px;margin:0 auto;padding:0 24px;}</p>
-<p class="p2"><span class="Apple-converted-space">    </span></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.header{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display:flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>justify-content:space-between;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>align-items:center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom:32px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding:20px 28px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background:linear-gradient(135deg, rgba(124,92,255,.15), rgba(46,229,157,.10));</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border:1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius:var(--radius);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>backdrop-filter:blur(10px);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.logo h1{font-size:24px;margin:0;letter-spacing:-.3px}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.logo p{color:var(--muted);font-size:14px;margin-top:4px}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.badge{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding:8px 16px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background:rgba(124,92,255,.2);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border:1px solid rgba(124,92,255,.4);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius:999px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size:13px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight:600;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:#d9d2ff;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.main{display:grid;grid-template-columns:350px 1fr;gap:24px;margin-bottom:24px}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>@media(max-width:1200px){ .main{grid-template-columns:1fr} }</p>
-<p class="p2"><span class="Apple-converted-space">    </span></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.card{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border:1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>box-shadow:var(--shadow);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius:var(--radius);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding:24px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.section-title{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size:18px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin:0 0 20px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding-bottom:12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-bottom:1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display:flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>align-items:center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap:10px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>label{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display:block;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size:13px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight:600;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin:16px 0 8px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-transform:uppercase;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing:.5px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.btn{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width:100%;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding:14px 20px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-top:12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border:none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius:14px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight:700;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size:14px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>cursor:pointer;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition:all .3s;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-transform:uppercase;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing:.5px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.btn-primary{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background:linear-gradient(135deg, #7c5cff, #9d7cff);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:white;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>box-shadow:0 12px 35px rgba(124,92,255,.3);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.btn-primary:hover:not(:disabled){</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transform:translateY(-2px);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>box-shadow:0 16px 45px rgba(124,92,255,.4);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.btn-secondary{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background:linear-gradient(135deg, #2ee59d, #1bb88a);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:white;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>box-shadow:0 12px 35px rgba(46,229,157,.3);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.btn-secondary:hover:not(:disabled){</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transform:translateY(-2px);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>box-shadow:0 16px 45px rgba(46,229,157,.4);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.btn:disabled{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>opacity:.4;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>cursor:not-allowed;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.status{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-top:16px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding:12px 16px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius:12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background:rgba(46,229,157,.1);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border:1px solid rgba(46,229,157,.3);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:#a3f5d9;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size:13px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>line-height:1.5;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.status.error{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background:rgba(255,107,157,.1);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border:1px solid rgba(255,107,157,.3);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:#ffb8d2;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.kpi-grid{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display:grid;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>grid-template-columns:repeat(2, 1fr);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap:12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom:24px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.kpi-box{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding:20px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background:rgba(0,0,0,.25);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border:1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius:16px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-align:center;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.kpi-num{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size:32px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight:800;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background:linear-gradient(135deg, var(--accent), var(--accent2));</p>
-<p class="p1"><span class="Apple-converted-space">      </span>-webkit-background-clip:text;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>-webkit-text-fill-color:transparent;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background-clip:text;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.kpi-label{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size:12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-top:8px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-transform:uppercase;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing:.5px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.tabs{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display:flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap:8px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom:20px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-bottom:1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.tab{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding:10px 20px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background:transparent;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border:none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>cursor:pointer;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-bottom:2px solid transparent;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition:all .2s;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size:14px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight:600;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.tab.active{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:var(--text);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-bottom-color:var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.tab-content{display:none}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.tab-content.active{display:block}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.transcript-list{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>max-height:400px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>overflow-y:auto;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.transcript-item{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding:14px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background:rgba(0,0,0,.2);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border:1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius:12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom:10px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.transcript-name{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight:600;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size:14px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:var(--text);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom:4px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.transcript-preview{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size:12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>overflow:hidden;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-overflow:ellipsis;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>white-space:nowrap;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.transcript-meta{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display:flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>justify-content:space-between;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-top:8px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size:11px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pattern-card{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding:20px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background:rgba(0,0,0,.2);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border:1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius:16px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom:16px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pattern-header{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display:flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>justify-content:space-between;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>align-items:center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom:12px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pattern-title{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size:16px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight:700;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:var(--accent2);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pattern-count{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size:12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background:rgba(255,255,255,.05);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding:4px 10px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius:999px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.keywords{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display:flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex-wrap:wrap;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap:8px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin:12px 0;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.keyword{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding:6px 12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background:rgba(124,92,255,.15);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border:1px solid rgba(124,92,255,.3);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius:999px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size:12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family:var(--mono);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:#c5b3ff;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.ai-insight{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-top:16px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding:16px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background:linear-gradient(135deg, rgba(124,92,255,.1), rgba(46,229,157,.08));</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-left:3px solid var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius:10px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.ai-insight-header{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size:12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-transform:uppercase;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing:.5px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight:700;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom:8px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display:flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>align-items:center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap:6px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.ai-insight-content{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:var(--text);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>line-height:1.6;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size:14px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.quote{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-top:12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding:14px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background:rgba(46,229,157,.08);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-left:3px solid var(--accent2);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius:10px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size:13px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>line-height:1.6;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-style:italic;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.loading{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-align:center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding:40px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.spinner{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border:3px solid rgba(124,92,255,.2);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-top:3px solid var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius:50%;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width:40px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>height:40px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>animation:spin 1s linear infinite;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin:0 auto 16px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>@keyframes spin{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>0%{transform:rotate(0deg)}</p>
-<p class="p1"><span class="Apple-converted-space">      </span>100%{transform:rotate(360deg)}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.empty-state{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-align:center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding:60px 20px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.file-drop-zone{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border:2px dashed var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius:12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding:30px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-align:center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin:16px 0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>cursor:pointer;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition:all .2s;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.file-drop-zone:hover{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-color:var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background:rgba(124,92,255,.05);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.info-box{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-top:20px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding:16px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background:rgba(124,92,255,.1);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border:1px solid rgba(124,92,255,.25);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius:14px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size:13px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>line-height:1.6;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color:var(--muted);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.info-box strong{color:var(--text)}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="wrap"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="header"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="logo"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;h1&gt;🎓 Learning Signals&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;p&gt;Educational Transcript Analysis Platform&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="badge"&gt;Research Demo&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="main"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;!-- Sidebar --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2 class="section-title"&gt;📊 Transcript Library&lt;/h2&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-grid"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="kpi-box"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="kpi-num" id="totalTranscripts"&gt;0&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="kpi-label"&gt;Transcripts&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="kpi-box"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="kpi-num" id="totalWords"&gt;0&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="kpi-label"&gt;Total Words&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-secondary" id="loadSample"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>📝 Load Sample Data (12 transcripts)</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/button&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style="position:relative;margin:20px 0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style="text-align:center;color:var(--muted);font-size:13px"&gt;or upload CSV&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="file-drop-zone" id="dropZone"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style="font-size:32px;margin-bottom:10px"&gt;📁&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style="font-size:14px;color:var(--text);margin-bottom:6px"&gt;Drop CSV file here&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style="font-size:12px;color:var(--muted)"&gt;or click to browse&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;input type="file" id="fileInput" accept=".csv" style="display:none"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="transcript-list" id="transcriptList"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="empty-state" style="padding:30px 10px"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style="font-size:32px;margin-bottom:8px"&gt;📄&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p style="font-size:13px"&gt;No transcripts loaded&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-primary" id="analyzeBtn" disabled style="margin-top:16px"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>🚀 Analyze with AI</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/button&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="status" id="status"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>Ready to analyze learning data</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="info-box"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;strong&gt;💡 How it works:&lt;/strong&gt;&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>1. TF-IDF vectorization&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>2. K-means clustering&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>3. AI interpretation (Claude)&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>4. Human validation</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;!-- Main Content --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="tabs"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;button class="tab active" data-tab="analysis"&gt;Analysis Results&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;button class="tab" data-tab="architecture"&gt;Production Architecture&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="tab-content active" id="tab-analysis"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div id="results"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="empty-state"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style="font-size:48px;margin-bottom:16px"&gt;📈&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;p&gt;Load transcripts and click "Analyze with AI" to discover patterns&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="tab-content" id="tab-architecture"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style="padding:20px"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3 style="font-size:20px;margin-bottom:20px;color:var(--accent2)"&gt;Scaling to 1,000+ Transcripts&lt;/h3&gt;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style="background:rgba(0,0,0,.3);padding:20px;border-radius:14px;margin-bottom:20px;font-family:var(--mono);font-size:13px;color:var(--muted);line-height:2"&gt;</p>
-<p class="p1">Voice/Data Input → Batch Ingestion → ETL Pipeline&lt;br&gt;</p>
-<p class="p1">&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;↓&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;↓&lt;br&gt;</p>
-<p class="p1">Transcription&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;PostgreSQL + Vector DB&lt;br&gt;</p>
-<p class="p1">&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;↓&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;↓&lt;br&gt;</p>
-<p class="p1">Processing Queue&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;Background Jobs (Celery)&lt;br&gt;</p>
-<p class="p1">&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;↓&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;↓&lt;br&gt;</p>
-<p class="p1">LLM Analysis&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;Claude/GPT-4&lt;br&gt;</p>
-<p class="p1">&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;↓&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;↓&lt;br&gt;</p>
-<p class="p1">Dashboard Output&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;Research Interface</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style="padding:16px;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:12px"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;h4 style="color:var(--accent);font-size:14px;margin-bottom:10px"&gt;🗄️ Data Layer&lt;/h4&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;ul style="color:var(--muted);font-size:13px;line-height:1.8;list-style:none;padding:0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                  </span>&lt;li&gt;• PostgreSQL for metadata&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                  </span>&lt;li&gt;• Pinecone for embeddings&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                  </span>&lt;li&gt;• Redis for caching&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                  </span>&lt;li&gt;• S3 for raw files&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/ul&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style="padding:16px;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:12px"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;h4 style="color:var(--accent);font-size:14px;margin-bottom:10px"&gt;⚙️ Processing&lt;/h4&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;ul style="color:var(--muted);font-size:13px;line-height:1.8;list-style:none;padding:0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                  </span>&lt;li&gt;• Python FastAPI backend&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                  </span>&lt;li&gt;• Celery task queue&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                  </span>&lt;li&gt;• Batch LLM calls&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                  </span>&lt;li&gt;• Async processing&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/ul&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style="padding:16px;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:12px"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;h4 style="color:var(--accent2);font-size:14px;margin-bottom:10px"&gt;📊 Scale Estimates (1,200 transcripts)&lt;/h4&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style="color:var(--muted);font-size:13px;line-height:1.8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;strong style="color:var(--text)"&gt;Performance:&lt;/strong&gt;&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>• Ingestion: ~2-3 hours for full batch&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>• Embeddings: ~1-2 hours (OpenAI ada-002)&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>• LLM Analysis: ~3-4 hours (batch processing)&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>• Query Speed: &lt;2s per search&lt;br&gt;&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;strong style="color:var(--text)"&gt;Costs:&lt;/strong&gt;&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>• LLM Processing: ~$150-200 (Claude Sonnet)&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>• Embeddings: ~$5-10 (OpenAI)&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>• Vector DB: ~$70/month (Pinecone)&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>• Infrastructure: ~$50/month (AWS)&lt;br&gt;&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;strong style="color:var(--text)"&gt;Timeline:&lt;/strong&gt;&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>• Week 1-2: Backend API + database setup&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>• Week 3-4: Integration + testing&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>• Week 5: Production deployment</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;script&gt;</p>
-<p class="p1">// Sample data</p>
-<p class="p1">const SAMPLE_DATA = [</p>
-<p class="p1"><span class="Apple-converted-space">  </span>{ id: 1, name: "Student_001", text: "The collaborative project really helped me understand how theoretical concepts apply in practice. Working with my peers exposed me to different perspectives I hadn't considered." },</p>
-<p class="p1"><span class="Apple-converted-space">  </span>{ id: 2, name: "Student_002", text: "I struggled initially with the complex readings but office hours clarified key concepts. The instructor's examples bridged theory and application effectively." },</p>
-<p class="p1"><span class="Apple-converted-space">  </span>{ id: 3, name: "Student_003", text: "Group discussions were transformative - hearing classmates' interpretations deepened my understanding. I learned to articulate my thinking more clearly through peer dialogue." },</p>
-<p class="p1"><span class="Apple-converted-space">  </span>{ id: 4, name: "Student_004", text: "The hands-on activities made abstract concepts concrete. I appreciated learning by doing rather than just memorizing definitions from lectures." },</p>
-<p class="p1"><span class="Apple-converted-space">  </span>{ id: 5, name: "Student_005", text: "Time management was my biggest challenge. Balancing readings, assignments, and projects taught me to prioritize and plan better for future courses." },</p>
-<p class="p1"><span class="Apple-converted-space">  </span>{ id: 6, name: "Student_006", text: "The iterative feedback process improved my work significantly. Revising based on comments helped me develop critical self-assessment skills." },</p>
-<p class="p1"><span class="Apple-converted-space">  </span>{ id: 7, name: "Student_007", text: "Connecting course material to real-world applications motivated me. Case studies showed relevance beyond the classroom which increased my engagement." },</p>
-<p class="p1"><span class="Apple-converted-space">  </span>{ id: 8, name: "Student_008", text: "Peer teaching moments were valuable - explaining concepts to classmates reinforced my own understanding and revealed gaps in my knowledge." },</p>
-<p class="p1"><span class="Apple-converted-space">  </span>{ id: 9, name: "Student_009", text: "The diverse examples from different industries helped contextualize theories. Seeing multiple applications made the content feel more accessible and relevant." },</p>
-<p class="p1"><span class="Apple-converted-space">  </span>{ id: 10, name: "Student_010", text: "Reflective writing assignments pushed me to think metacognitively about my learning process. This self-awareness will benefit my future academic work." },</p>
-<p class="p1"><span class="Apple-converted-space">  </span>{ id: 11, name: "Student_011", text: "I found the asynchronous discussion forums helpful for processing ideas at my own pace before contributing. This format accommodated different thinking styles." },</p>
-<p class="p1"><span class="Apple-converted-space">  </span>{ id: 12, name: "Student_012", text: "Guest speakers brought practitioner perspectives that enriched the academic content. Their stories illustrated how concepts translate to professional contexts." }</p>
-<p class="p1">];</p>
-<p class="p2"><br></p>
-<p class="p1">const state = { transcripts: [] };</p>
-<p class="p2"><br></p>
-<p class="p1">function updateDashboard() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('totalTranscripts').textContent = state.transcripts.length;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const totalWords = state.transcripts.reduce((sum, t) =&gt; sum + t.text.split(' ').length, 0);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('totalWords').textContent = totalWords.toLocaleString();</p>
-<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('analyzeBtn').disabled = state.transcripts.length === 0;</p>
-<p class="p2"><span class="Apple-converted-space">  </span></p>
-<p class="p1"><span class="Apple-converted-space">  </span>renderTranscriptList();</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function renderTranscriptList() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const container = document.getElementById('transcriptList');</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if (state.transcripts.length === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>container.innerHTML = '&lt;div class="empty-state" style="padding:30px 10px"&gt;&lt;div style="font-size:32px;margin-bottom:8px"&gt;📄&lt;/div&gt;&lt;p style="font-size:13px"&gt;No transcripts loaded&lt;/p&gt;&lt;/div&gt;';</p>
-<p class="p1"><span class="Apple-converted-space">    </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>container.innerHTML = state.transcripts.map(t =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const preview = t.text.substring(0, 60) + '...';</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const wordCount = t.text.split(' ').length;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>return `</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="transcript-item"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="transcript-name"&gt;${escapeHTML(t.name)}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="transcript-preview"&gt;${escapeHTML(preview)}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="transcript-meta"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;span&gt;${wordCount} words&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}).join('');</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">// Analysis functions</p>
-<p class="p1">function cleanText(s) {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>return String(s || "")</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.toLowerCase()</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.replace(/https?:\/\/\S+/g, " ")</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.replace(/[^a-z0-9\s']/g, " ")</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.replace(/\s+/g, " ")</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.trim();</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function tokenize(s) {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const stop = new Set([</p>
-<p class="p1"><span class="Apple-converted-space">    </span>"the", "a", "an", "and", "or", "but", "if", "then", "else", "when", "while", "to", "of", "in", "on", "for", "with", "as", "at", "by",</p>
-<p class="p1"><span class="Apple-converted-space">    </span>"is", "are", "was", "were", "be", "been", "being", "it", "this", "that", "these", "those", "i", "we", "you", "they", "he", "she", "my",</p>
-<p class="p1"><span class="Apple-converted-space">    </span>"our", "your", "their", "me", "us", "him", "her", "them", "from", "into", "about", "over", "under", "again", "very", "really", "just",</p>
-<p class="p1"><span class="Apple-converted-space">    </span>"so", "because", "can", "could", "should", "would", "will", "did", "do", "does", "done", "than", "too", "also", "not"</p>
-<p class="p1"><span class="Apple-converted-space">  </span>]);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>return s.split(" ")</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.map(t =&gt; t.trim())</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.filter(t =&gt; t.length &gt;= 3 &amp;&amp; !stop.has(t));</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function buildVocab(docs) {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const df = new Map();</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const tdocs = [];</p>
-<p class="p1"><span class="Apple-converted-space">  </span>docs.forEach(d =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const toks = tokenize(cleanText(d));</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const uniq = new Set(toks);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>uniq.forEach(t =&gt; df.set(t, (df.get(t) || 0) + 1));</p>
-<p class="p1"><span class="Apple-converted-space">    </span>tdocs.push(toks);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const terms = [...df.entries()]</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.filter(([t, c]) =&gt; c &gt;= 1)</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.sort((a, b) =&gt; b[1] - a[1])</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.slice(0, 2500)</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.map(([t]) =&gt; t);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const idx = new Map();</p>
-<p class="p1"><span class="Apple-converted-space">  </span>terms.forEach((t, i) =&gt; idx.set(t, i));</p>
-<p class="p1"><span class="Apple-converted-space">  </span>return { terms, idx, tdocs };</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function tfidfMatrix(tdocs, terms, idx) {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const N = tdocs.length;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const df = new Array(terms.length).fill(0);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const tf = tdocs.map(toks =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const counts = new Map();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>toks.forEach(t =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (idx.has(t)) counts.set(t, (counts.get(t) || 0) + 1);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">    </span>counts.forEach((v, t) =&gt; { df[idx.get(t)] += 1; });</p>
-<p class="p1"><span class="Apple-converted-space">    </span>return counts;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const idf = df.map(dfi =&gt; Math.log((N + 1) / (dfi + 1)) + 1);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const X = tf.map(counts =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const vec = new Array(terms.length).fill(0);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>counts.forEach((v, t) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const j = idx.get(t);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>vec[j] = (v) * idf[j];</p>
-<p class="p1"><span class="Apple-converted-space">    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const norm = Math.sqrt(vec.reduce((s, x) =&gt; s + x * x, 0)) || 1;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>for (let j = 0; j &lt; vec.length; j++) vec[j] /= norm;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>return vec;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>return { X };</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function cosineDistance(a, b) {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>let dot = 0;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>for (let i = 0; i &lt; a.length; i++) dot += a[i] * b[i];</p>
-<p class="p1"><span class="Apple-converted-space">  </span>return 1 - dot;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function kmeans(X, k, iters = 25) {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const n = X.length;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const d = X[0].length;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const idxs = [...Array(n).keys()];</p>
-<p class="p1"><span class="Apple-converted-space">  </span>for (let i = idxs.length - 1; i &gt; 0; i--) {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const j = Math.floor(Math.random() * (i + 1));</p>
-<p class="p1"><span class="Apple-converted-space">    </span>[idxs[i], idxs[j]] = [idxs[j], idxs[i]];</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>let centers = idxs.slice(0, k).map(i =&gt; X[i].slice());</p>
-<p class="p1"><span class="Apple-converted-space">  </span>let labels = new Array(n).fill(0);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>for (let it = 0; it &lt; iters; it++) {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>let changed = false;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>for (let i = 0; i &lt; n; i++) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>let best = 0, bestDist = Infinity;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>for (let c = 0; c &lt; k; c++) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const dist = cosineDistance(X[i], centers[c]);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>if (dist &lt; bestDist) { bestDist = dist; best = c; }</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (labels[i] !== best) { labels[i] = best; changed = true; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const newCenters = Array.from({ length: k }, () =&gt; new Array(d).fill(0));</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const counts = new Array(k).fill(0);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>for (let i = 0; i &lt; n; i++) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const c = labels[i];</p>
-<p class="p1"><span class="Apple-converted-space">      </span>counts[c] += 1;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const xi = X[i];</p>
-<p class="p1"><span class="Apple-converted-space">      </span>for (let j = 0; j &lt; d; j++) newCenters[c][j] += xi[j];</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>for (let c = 0; c &lt; k; c++) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (counts[c] === 0) continue;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>for (let j = 0; j &lt; d; j++) newCenters[c][j] /= counts[c];</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const norm = Math.sqrt(newCenters[c].reduce((s, x) =&gt; s + x * x, 0)) || 1;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>for (let j = 0; j &lt; d; j++) newCenters[c][j] /= norm;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>centers = newCenters;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>if (!changed) break;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>return { labels, centers };</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function topKeywordsForCluster(centers, terms, topN) {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>return centers.map(center =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const pairs = center.map((w, i) =&gt; [i, w]);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>pairs.sort((a, b) =&gt; b[1] - a[1]);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>return pairs.slice(0, topN).map(([i]) =&gt; terms[i]);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function representativeQuotes(X, labels, centers, texts, perCluster) {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const reps = [];</p>
-<p class="p1"><span class="Apple-converted-space">  </span>for (let c = 0; c &lt; centers.length; c++) {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const items = [];</p>
-<p class="p1"><span class="Apple-converted-space">    </span>for (let i = 0; i &lt; X.length; i++) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (labels[i] !== c) continue;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const dist = cosineDistance(X[i], centers[c]);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>items.push([dist, i]);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>items.sort((a, b) =&gt; a[0] - b[0]);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>reps[c] = items.slice(0, perCluster).map(([, i]) =&gt; texts[i]);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>return reps;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">async function generateInsights(keywords, quotes) {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const insights = [];</p>
-<p class="p2"><span class="Apple-converted-space">  </span></p>
-<p class="p1"><span class="Apple-converted-space">  </span>for (let i = 0; i &lt; keywords.length; i++) {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const kw = keywords[i];</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const q = quotes[i] || [];</p>
-<p class="p2"><span class="Apple-converted-space">    </span></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const prompt = `You are an educational researcher analyzing learning data.</p>
-<p class="p2"><br></p>
-<p class="p1">Pattern ${i + 1} keywords: ${kw.join(", ")}</p>
-<p class="p1">Sample quotes:</p>
-<p class="p1">${q.map((qt, idx) =&gt; `${idx + 1}. "${qt}"`).join("\n")}</p>
-<p class="p2"><br></p>
-<p class="p1">Provide a brief 2-3 sentence interpretation of the educational theme this pattern reveals.`;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const response = await fetch("https://api.anthropic.com/v1/messages", {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>method: "POST",</p>
-<p class="p1"><span class="Apple-converted-space">        </span>headers: { "Content-Type": "application/json" },</p>
-<p class="p1"><span class="Apple-converted-space">        </span>body: JSON.stringify({</p>
-<p class="p1"><span class="Apple-converted-space">          </span>model: "claude-sonnet-4-20250514",</p>
-<p class="p1"><span class="Apple-converted-space">          </span>max_tokens: 1000,</p>
-<p class="p1"><span class="Apple-converted-space">          </span>messages: [{ role: "user", content: prompt }]</p>
-<p class="p1"><span class="Apple-converted-space">        </span>})</p>
-<p class="p1"><span class="Apple-converted-space">      </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>const data = await response.json();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const text = data.content?.map(c =&gt; c.text || "").join("") || "Analysis unavailable";</p>
-<p class="p1"><span class="Apple-converted-space">      </span>insights.push(text.trim());</p>
-<p class="p1"><span class="Apple-converted-space">    </span>} catch (err) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>console.error("AI error:", err);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>insights.push("Pattern analysis: " + kw.slice(0, 3).join(", ") + " and related themes");</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><span class="Apple-converted-space">  </span></p>
-<p class="p1"><span class="Apple-converted-space">  </span>return insights;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function escapeHTML(str) {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>return String(str)</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.replaceAll("&amp;", "&amp;amp;")</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.replaceAll("&lt;", "&amp;lt;")</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.replaceAll("&gt;", "&amp;gt;")</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.replaceAll('"', "&amp;quot;");</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">async function runAnalysis() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const texts = state.transcripts.map(t =&gt; t.text);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const k = Math.min(3, Math.max(2, Math.floor(texts.length / 4)));</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const container = document.getElementById('results');</p>
-<p class="p1"><span class="Apple-converted-space">  </span>container.innerHTML = '&lt;div class="loading"&gt;&lt;div class="spinner"&gt;&lt;/div&gt;&lt;p&gt;Analyzing ' + texts.length + ' transcripts...&lt;/p&gt;&lt;/div&gt;';</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const { terms, idx, tdocs } = buildVocab(texts);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>if (terms.length &lt; 5) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>container.innerHTML = '&lt;div class="empty-state"&gt;&lt;p&gt;Not enough text data&lt;/p&gt;&lt;/div&gt;';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const { X } = tfidfMatrix(tdocs, terms, idx);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const { labels, centers } = kmeans(X, k, 25);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const keywords = topKeywordsForCluster(centers, terms, 6);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const reps = representativeQuotes(X, labels, centers, texts, 2);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const insights = await generateInsights(keywords, reps);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const counts = labels.reduce((acc, l) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>acc[l] = (acc[l] || 0) + 1;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>return acc;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}, {});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>let html = `</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="kpi-grid" style="grid-template-columns:repeat(4, 1fr);margin-bottom:24px"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-box"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="kpi-num"&gt;${texts.length}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="kpi-label"&gt;Transcripts&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-box"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="kpi-num"&gt;${k}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="kpi-label"&gt;Patterns&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-box"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="kpi-num"&gt;${keywords[0].length * k}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="kpi-label"&gt;Keywords&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-box"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="kpi-num"&gt;${texts.reduce((s, t) =&gt; s + t.split(' ').length, 0).toLocaleString()}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="kpi-label"&gt;Words&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>`;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>for (let c = 0; c &lt; k; c++) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>html += `</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="pattern-card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="pattern-header"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="pattern-title"&gt;Pattern ${c + 1}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="pattern-count"&gt;${counts[c] || 0} transcripts&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">          </span></p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="keywords"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>${keywords[c].map(kw =&gt; `&lt;span class="keyword"&gt;${escapeHTML(kw)}&lt;/span&gt;`).join("")}</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="ai-insight"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="ai-insight-header"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;span&gt;✨&lt;/span&gt; AI Interpretation</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="ai-insight-content"&gt;${escapeHTML(insights[c])}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">          </span>${(reps[c] || []).map(q =&gt; `</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="quote"&gt;"${escapeHTML(q)}"&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>`).join("")}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>container.innerHTML = html;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('status').textContent = '✓ Analysis complete!';</p>
-<p class="p1"><span class="Apple-converted-space">  </span>} catch (err) {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>console.error(err);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>container.innerHTML = '&lt;div class="empty-state"&gt;&lt;p&gt;Analysis error. Try again.&lt;/p&gt;&lt;/div&gt;';</p>
-<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('status').textContent = 'Error during analysis';</p>
-<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('status').classList.add('error');</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">// Event listeners</p>
-<p class="p1">document.getElementById('loadSample').addEventListener('click', () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>state.transcripts = [...SAMPLE_DATA];</p>
-<p class="p1"><span class="Apple-converted-space">  </span>updateDashboard();</p>
-<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('status').textContent = 'Loaded 12 sample transcripts. Ready to analyze!';</p>
-<p class="p1">});</p>
-<p class="p2"><br></p>
-<p class="p1">document.getElementById('dropZone').addEventListener('click', () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('fileInput').click();</p>
-<p class="p1">});</p>
-<p class="p2"><br></p>
-<p class="p1">document.getElementById('fileInput').addEventListener('change', async (e) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const file = e.target.files?.[0];</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if (!file) return;</p>
-<p class="p2"><span class="Apple-converted-space">  </span></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const text = await file.text();</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const rows = text.split('\n').filter(l =&gt; l.trim());</p>
-<p class="p2"><span class="Apple-converted-space">  </span></p>
-<p class="p1"><span class="Apple-converted-space">  </span>if (rows.length &gt; 1) {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const headers = rows[0].split(',');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const textColIdx = headers.findIndex(h =&gt; h.toLowerCase().includes('text') || h.toLowerCase().includes('reflection'));</p>
-<p class="p2"><span class="Apple-converted-space">    </span></p>
-<p class="p1"><span class="Apple-converted-space">    </span>if (textColIdx &gt;= 0) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>state.transcripts = rows.slice(1).map((row, idx) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const cols = row.split(',');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>return {</p>
-<p class="p1"><span class="Apple-converted-space">          </span>id: idx + 1,</p>
-<p class="p1"><span class="Apple-converted-space">          </span>name: `Row_${idx + 1}`,</p>
-<p class="p1"><span class="Apple-converted-space">          </span>text: cols[textColIdx] || ""</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}).filter(t =&gt; t.text.trim());</p>
-<p class="p2"><span class="Apple-converted-space">      </span></p>
-<p class="p1"><span class="Apple-converted-space">      </span>updateDashboard();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('status').textContent = `Loaded ${state.transcripts.length} transcripts from CSV`;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p1">});</p>
-<p class="p2"><br></p>
-<p class="p1">document.getElementById('analyzeBtn').addEventListener('click', runAnalysis);</p>
-<p class="p2"><br></p>
-<p class="p1">// Tab switching</p>
-<p class="p1">document.querySelectorAll('.tab').forEach(tab =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>tab.addEventListener('click', () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>document.querySelectorAll('.tab').forEach(t =&gt; t.classList.remove('active'));</p>
-<p class="p1"><span class="Apple-converted-space">    </span>document.querySelectorAll('.tab-content').forEach(c =&gt; c.classList.remove('active'));</p>
-<p class="p2"><span class="Apple-converted-space">    </span></p>
-<p class="p1"><span class="Apple-converted-space">    </span>tab.classList.add('active');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const target = tab.dataset.tab;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById(`tab-${target}`).classList.add('active');</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p1">});</p>
-<p class="p2"><br></p>
-<p class="p1">updateDashboard();</p>
-<p class="p1">&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+  <div class="wrap">
+    <div class="header">
+      <div class="logo">
+        <h1>🎓 Learning Signals</h1>
+        <p>Educational Transcript Analysis Platform</p>
+      </div>
+      <div class="badge">Research Demo</div>
+    </div>
+
+    <div class="main">
+      <!-- Sidebar -->
+      <div class="card">
+        <h2 class="section-title">📊 Transcript Library</h2>
+
+        <div class="kpi-grid">
+          <div class="kpi-box">
+            <div class="kpi-num" id="totalTranscripts">0</div>
+            <div class="kpi-label">Transcripts</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-num" id="totalWords">0</div>
+            <div class="kpi-label">Total Words</div>
+          </div>
+        </div>
+
+        <button class="btn btn-secondary" id="loadSample">
+          📝 Load Sample Data (12 transcripts)
+        </button>
+
+        <div style="position:relative;margin:20px 0">
+          <div style="text-align:center;color:var(--muted);font-size:13px">or upload CSV</div>
+        </div>
+
+        <div class="file-drop-zone" id="dropZone">
+          <div style="font-size:32px;margin-bottom:10px">📁</div>
+          <div style="font-size:14px;color:var(--text);margin-bottom:6px">Drop CSV file here</div>
+          <div style="font-size:12px;color:var(--muted)">or click to browse</div>
+          <input type="file" id="fileInput" accept=".csv" style="display:none">
+        </div>
+
+        <div class="transcript-list" id="transcriptList">
+          <div class="empty-state" style="padding:30px 10px">
+            <div style="font-size:32px;margin-bottom:8px">📄</div>
+            <p style="font-size:13px">No transcripts loaded</p>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="analyzeBtn" disabled style="margin-top:16px">
+          🚀 Analyze with AI
+        </button>
+
+        <div class="status" id="status">
+          Ready to analyze learning data
+        </div>
+
+        <div class="info-box">
+          <strong>💡 How it works:</strong><br>
+          1. TF-IDF vectorization<br>
+          2. K-means clustering<br>
+          3. AI interpretation (Claude)<br>
+          4. Human validation
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="card">
+        <div class="tabs">
+          <button class="tab active" data-tab="analysis">Analysis Results</button>
+          <button class="tab" data-tab="architecture">Production Architecture</button>
+        </div>
+
+        <div class="tab-content active" id="tab-analysis">
+          <div id="results">
+            <div class="empty-state">
+              <div style="font-size:48px;margin-bottom:16px">📈</div>
+              <p>Load transcripts and click "Analyze with AI" to discover patterns</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-architecture">
+          <div style="padding:20px">
+            <h3 style="font-size:20px;margin-bottom:20px;color:var(--accent2)">Scaling to 1,000+ Transcripts</h3>
+            
+            <div style="background:rgba(0,0,0,.3);padding:20px;border-radius:14px;margin-bottom:20px;font-family:var(--mono);font-size:13px;color:var(--muted);line-height:2">
+Voice/Data Input → Batch Ingestion → ETL Pipeline<br>
+&nbsp;&nbsp;&nbsp;&nbsp;↓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+Transcription&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PostgreSQL + Vector DB<br>
+&nbsp;&nbsp;&nbsp;&nbsp;↓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+Processing Queue&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Background Jobs (Celery)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;↓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+LLM Analysis&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Claude/GPT-4<br>
+&nbsp;&nbsp;&nbsp;&nbsp;↓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+Dashboard Output&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Research Interface
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+              <div style="padding:16px;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:12px">
+                <h4 style="color:var(--accent);font-size:14px;margin-bottom:10px">🗄️ Data Layer</h4>
+                <ul style="color:var(--muted);font-size:13px;line-height:1.8;list-style:none;padding:0">
+                  <li>• PostgreSQL for metadata</li>
+                  <li>• Pinecone for embeddings</li>
+                  <li>• Redis for caching</li>
+                  <li>• S3 for raw files</li>
+                </ul>
+              </div>
+              <div style="padding:16px;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:12px">
+                <h4 style="color:var(--accent);font-size:14px;margin-bottom:10px">⚙️ Processing</h4>
+                <ul style="color:var(--muted);font-size:13px;line-height:1.8;list-style:none;padding:0">
+                  <li>• Python FastAPI backend</li>
+                  <li>• Celery task queue</li>
+                  <li>• Batch LLM calls</li>
+                  <li>• Async processing</li>
+                </ul>
+              </div>
+            </div>
+
+            <div style="padding:16px;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:12px">
+              <h4 style="color:var(--accent2);font-size:14px;margin-bottom:10px">📊 Scale Estimates (1,200 transcripts)</h4>
+              <div style="color:var(--muted);font-size:13px;line-height:1.8">
+                <strong style="color:var(--text)">Performance:</strong><br>
+                • Ingestion: ~2-3 hours for full batch<br>
+                • Embeddings: ~1-2 hours (OpenAI ada-002)<br>
+                • LLM Analysis: ~3-4 hours (batch processing)<br>
+                • Query Speed: <2s per search<br><br>
+                <strong style="color:var(--text)">Costs:</strong><br>
+                • LLM Processing: ~$150-200 (Claude Sonnet)<br>
+                • Embeddings: ~$5-10 (OpenAI)<br>
+                • Vector DB: ~$70/month (Pinecone)<br>
+                • Infrastructure: ~$50/month (AWS)<br><br>
+                <strong style="color:var(--text)">Timeline:</strong><br>
+                • Week 1-2: Backend API + database setup<br>
+                • Week 3-4: Integration + testing<br>
+                • Week 5: Production deployment
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// Sample data
+const SAMPLE_DATA = [
+  { id: 1, name: "Student_001", text: "The collaborative project really helped me understand how theoretical concepts apply in practice. Working with my peers exposed me to different perspectives I hadn't considered." },
+  { id: 2, name: "Student_002", text: "I struggled initially with the complex readings but office hours clarified key concepts. The instructor's examples bridged theory and application effectively." },
+  { id: 3, name: "Student_003", text: "Group discussions were transformative - hearing classmates' interpretations deepened my understanding. I learned to articulate my thinking more clearly through peer dialogue." },
+  { id: 4, name: "Student_004", text: "The hands-on activities made abstract concepts concrete. I appreciated learning by doing rather than just memorizing definitions from lectures." },
+  { id: 5, name: "Student_005", text: "Time management was my biggest challenge. Balancing readings, assignments, and projects taught me to prioritize and plan better for future courses." },
+  { id: 6, name: "Student_006", text: "The iterative feedback process improved my work significantly. Revising based on comments helped me develop critical self-assessment skills." },
+  { id: 7, name: "Student_007", text: "Connecting course material to real-world applications motivated me. Case studies showed relevance beyond the classroom which increased my engagement." },
+  { id: 8, name: "Student_008", text: "Peer teaching moments were valuable - explaining concepts to classmates reinforced my own understanding and revealed gaps in my knowledge." },
+  { id: 9, name: "Student_009", text: "The diverse examples from different industries helped contextualize theories. Seeing multiple applications made the content feel more accessible and relevant." },
+  { id: 10, name: "Student_010", text: "Reflective writing assignments pushed me to think metacognitively about my learning process. This self-awareness will benefit my future academic work." },
+  { id: 11, name: "Student_011", text: "I found the asynchronous discussion forums helpful for processing ideas at my own pace before contributing. This format accommodated different thinking styles." },
+  { id: 12, name: "Student_012", text: "Guest speakers brought practitioner perspectives that enriched the academic content. Their stories illustrated how concepts translate to professional contexts." }
+];
+
+const state = { transcripts: [] };
+
+function updateDashboard() {
+  document.getElementById('totalTranscripts').textContent = state.transcripts.length;
+  const totalWords = state.transcripts.reduce((sum, t) => sum + t.text.split(' ').length, 0);
+  document.getElementById('totalWords').textContent = totalWords.toLocaleString();
+  document.getElementById('analyzeBtn').disabled = state.transcripts.length === 0;
+  
+  renderTranscriptList();
+}
+
+function renderTranscriptList() {
+  const container = document.getElementById('transcriptList');
+  if (state.transcripts.length === 0) {
+    container.innerHTML = '<div class="empty-state" style="padding:30px 10px"><div style="font-size:32px;margin-bottom:8px">📄</div><p style="font-size:13px">No transcripts loaded</p></div>';
+    return;
+  }
+
+  container.innerHTML = state.transcripts.map(t => {
+    const preview = t.text.substring(0, 60) + '...';
+    const wordCount = t.text.split(' ').length;
+    return `
+      <div class="transcript-item">
+        <div class="transcript-name">${escapeHTML(t.name)}</div>
+        <div class="transcript-preview">${escapeHTML(preview)}</div>
+        <div class="transcript-meta">
+          <span>${wordCount} words</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Analysis functions
+function cleanText(s) {
+  return String(s || "")
+    .toLowerCase()
+    .replace(/https?:\/\/\S+/g, " ")
+    .replace(/[^a-z0-9\s']/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function tokenize(s) {
+  const stop = new Set([
+    "the", "a", "an", "and", "or", "but", "if", "then", "else", "when", "while", "to", "of", "in", "on", "for", "with", "as", "at", "by",
+    "is", "are", "was", "were", "be", "been", "being", "it", "this", "that", "these", "those", "i", "we", "you", "they", "he", "she", "my",
+    "our", "your", "their", "me", "us", "him", "her", "them", "from", "into", "about", "over", "under", "again", "very", "really", "just",
+    "so", "because", "can", "could", "should", "would", "will", "did", "do", "does", "done", "than", "too", "also", "not"
+  ]);
+  return s.split(" ")
+    .map(t => t.trim())
+    .filter(t => t.length >= 3 && !stop.has(t));
+}
+
+function buildVocab(docs) {
+  const df = new Map();
+  const tdocs = [];
+  docs.forEach(d => {
+    const toks = tokenize(cleanText(d));
+    const uniq = new Set(toks);
+    uniq.forEach(t => df.set(t, (df.get(t) || 0) + 1));
+    tdocs.push(toks);
+  });
+
+  const terms = [...df.entries()]
+    .filter(([t, c]) => c >= 1)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 2500)
+    .map(([t]) => t);
+
+  const idx = new Map();
+  terms.forEach((t, i) => idx.set(t, i));
+  return { terms, idx, tdocs };
+}
+
+function tfidfMatrix(tdocs, terms, idx) {
+  const N = tdocs.length;
+  const df = new Array(terms.length).fill(0);
+
+  const tf = tdocs.map(toks => {
+    const counts = new Map();
+    toks.forEach(t => {
+      if (idx.has(t)) counts.set(t, (counts.get(t) || 0) + 1);
+    });
+    counts.forEach((v, t) => { df[idx.get(t)] += 1; });
+    return counts;
+  });
+
+  const idf = df.map(dfi => Math.log((N + 1) / (dfi + 1)) + 1);
+
+  const X = tf.map(counts => {
+    const vec = new Array(terms.length).fill(0);
+    counts.forEach((v, t) => {
+      const j = idx.get(t);
+      vec[j] = (v) * idf[j];
+    });
+    const norm = Math.sqrt(vec.reduce((s, x) => s + x * x, 0)) || 1;
+    for (let j = 0; j < vec.length; j++) vec[j] /= norm;
+    return vec;
+  });
+
+  return { X };
+}
+
+function cosineDistance(a, b) {
+  let dot = 0;
+  for (let i = 0; i < a.length; i++) dot += a[i] * b[i];
+  return 1 - dot;
+}
+
+function kmeans(X, k, iters = 25) {
+  const n = X.length;
+  const d = X[0].length;
+
+  const idxs = [...Array(n).keys()];
+  for (let i = idxs.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [idxs[i], idxs[j]] = [idxs[j], idxs[i]];
+  }
+  let centers = idxs.slice(0, k).map(i => X[i].slice());
+  let labels = new Array(n).fill(0);
+
+  for (let it = 0; it < iters; it++) {
+    let changed = false;
+    for (let i = 0; i < n; i++) {
+      let best = 0, bestDist = Infinity;
+      for (let c = 0; c < k; c++) {
+        const dist = cosineDistance(X[i], centers[c]);
+        if (dist < bestDist) { bestDist = dist; best = c; }
+      }
+      if (labels[i] !== best) { labels[i] = best; changed = true; }
+    }
+    const newCenters = Array.from({ length: k }, () => new Array(d).fill(0));
+    const counts = new Array(k).fill(0);
+    for (let i = 0; i < n; i++) {
+      const c = labels[i];
+      counts[c] += 1;
+      const xi = X[i];
+      for (let j = 0; j < d; j++) newCenters[c][j] += xi[j];
+    }
+    for (let c = 0; c < k; c++) {
+      if (counts[c] === 0) continue;
+      for (let j = 0; j < d; j++) newCenters[c][j] /= counts[c];
+      const norm = Math.sqrt(newCenters[c].reduce((s, x) => s + x * x, 0)) || 1;
+      for (let j = 0; j < d; j++) newCenters[c][j] /= norm;
+    }
+    centers = newCenters;
+    if (!changed) break;
+  }
+  return { labels, centers };
+}
+
+function topKeywordsForCluster(centers, terms, topN) {
+  return centers.map(center => {
+    const pairs = center.map((w, i) => [i, w]);
+    pairs.sort((a, b) => b[1] - a[1]);
+    return pairs.slice(0, topN).map(([i]) => terms[i]);
+  });
+}
+
+function representativeQuotes(X, labels, centers, texts, perCluster) {
+  const reps = [];
+  for (let c = 0; c < centers.length; c++) {
+    const items = [];
+    for (let i = 0; i < X.length; i++) {
+      if (labels[i] !== c) continue;
+      const dist = cosineDistance(X[i], centers[c]);
+      items.push([dist, i]);
+    }
+    items.sort((a, b) => a[0] - b[0]);
+    reps[c] = items.slice(0, perCluster).map(([, i]) => texts[i]);
+  }
+  return reps;
+}
+
+async function generateInsights(keywords, quotes) {
+  const insights = [];
+  
+  for (let i = 0; i < keywords.length; i++) {
+    const kw = keywords[i];
+    const q = quotes[i] || [];
+    
+    const prompt = `You are an educational researcher analyzing learning data.
+
+Pattern ${i + 1} keywords: ${kw.join(", ")}
+Sample quotes:
+${q.map((qt, idx) => `${idx + 1}. "${qt}"`).join("\n")}
+
+Provide a brief 2-3 sentence interpretation of the educational theme this pattern reveals.`;
+
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1000,
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+
+      const data = await response.json();
+      const text = data.content?.map(c => c.text || "").join("") || "Analysis unavailable";
+      insights.push(text.trim());
+    } catch (err) {
+      console.error("AI error:", err);
+      insights.push("Pattern analysis: " + kw.slice(0, 3).join(", ") + " and related themes");
+    }
+  }
+  
+  return insights;
+}
+
+function escapeHTML(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+async function runAnalysis() {
+  const texts = state.transcripts.map(t => t.text);
+  const k = Math.min(3, Math.max(2, Math.floor(texts.length / 4)));
+
+  const container = document.getElementById('results');
+  container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Analyzing ' + texts.length + ' transcripts...</p></div>';
+
+  try {
+    const { terms, idx, tdocs } = buildVocab(texts);
+    if (terms.length < 5) {
+      container.innerHTML = '<div class="empty-state"><p>Not enough text data</p></div>';
+      return;
+    }
+
+    const { X } = tfidfMatrix(tdocs, terms, idx);
+    const { labels, centers } = kmeans(X, k, 25);
+    const keywords = topKeywordsForCluster(centers, terms, 6);
+    const reps = representativeQuotes(X, labels, centers, texts, 2);
+
+    const insights = await generateInsights(keywords, reps);
+
+    const counts = labels.reduce((acc, l) => {
+      acc[l] = (acc[l] || 0) + 1;
+      return acc;
+    }, {});
+
+    let html = `
+      <div class="kpi-grid" style="grid-template-columns:repeat(4, 1fr);margin-bottom:24px">
+        <div class="kpi-box">
+          <div class="kpi-num">${texts.length}</div>
+          <div class="kpi-label">Transcripts</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-num">${k}</div>
+          <div class="kpi-label">Patterns</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-num">${keywords[0].length * k}</div>
+          <div class="kpi-label">Keywords</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-num">${texts.reduce((s, t) => s + t.split(' ').length, 0).toLocaleString()}</div>
+          <div class="kpi-label">Words</div>
+        </div>
+      </div>
+    `;
+
+    for (let c = 0; c < k; c++) {
+      html += `
+        <div class="pattern-card">
+          <div class="pattern-header">
+            <div class="pattern-title">Pattern ${c + 1}</div>
+            <div class="pattern-count">${counts[c] || 0} transcripts</div>
+          </div>
+          
+          <div class="keywords">
+            ${keywords[c].map(kw => `<span class="keyword">${escapeHTML(kw)}</span>`).join("")}
+          </div>
+
+          <div class="ai-insight">
+            <div class="ai-insight-header">
+              <span>✨</span> AI Interpretation
+            </div>
+            <div class="ai-insight-content">${escapeHTML(insights[c])}</div>
+          </div>
+
+          ${(reps[c] || []).map(q => `
+            <div class="quote">"${escapeHTML(q)}"</div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    container.innerHTML = html;
+    document.getElementById('status').textContent = '✓ Analysis complete!';
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = '<div class="empty-state"><p>Analysis error. Try again.</p></div>';
+    document.getElementById('status').textContent = 'Error during analysis';
+    document.getElementById('status').classList.add('error');
+  }
+}
+
+// Event listeners
+document.getElementById('loadSample').addEventListener('click', () => {
+  state.transcripts = [...SAMPLE_DATA];
+  updateDashboard();
+  document.getElementById('status').textContent = 'Loaded 12 sample transcripts. Ready to analyze!';
+});
+
+document.getElementById('dropZone').addEventListener('click', () => {
+  document.getElementById('fileInput').click();
+});
+
+document.getElementById('fileInput').addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  
+  const text = await file.text();
+  const rows = text.split('\n').filter(l => l.trim());
+  
+  if (rows.length > 1) {
+    const headers = rows[0].split(',');
+    const textColIdx = headers.findIndex(h => h.toLowerCase().includes('text') || h.toLowerCase().includes('reflection'));
+    
+    if (textColIdx >= 0) {
+      state.transcripts = rows.slice(1).map((row, idx) => {
+        const cols = row.split(',');
+        return {
+          id: idx + 1,
+          name: `Row_${idx + 1}`,
+          text: cols[textColIdx] || ""
+        };
+      }).filter(t => t.text.trim());
+      
+      updateDashboard();
+      document.getElementById('status').textContent = `Loaded ${state.transcripts.length} transcripts from CSV`;
+    }
+  }
+});
+
+document.getElementById('analyzeBtn').addEventListener('click', runAnalysis);
+
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    tab.classList.add('active');
+    const target = tab.dataset.tab;
+    document.getElementById(`tab-${target}`).classList.add('active');
+  });
+});
+
+updateDashboard();
+</script>
 </body>
 </html>
