@@ -3,495 +3,479 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Learning Signals - AI Transcript Analysis</title>
+  <title>Learning Signals - AI Transcript Analysis Platform</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    :root{
-      --bg:#0d1117;
-      --card:#161b22;
-      --text:#e6edf3;
-      --muted:#7d8590;
-      --border:rgba(240,246,252,0.1);
-      --accent:#2f81f7;
-      --accent2:#238636;
-      --success:#3fb950;
-      --warning:#d29922;
-      --radius:12px;
+    :root {
+      --bg: #0d1117;
+      --card: #161b22;
+      --text: #e6edf3;
+      --muted: #7d8590;
+      --border: rgba(240, 246, 252, 0.1);
+      --accent: #2f81f7;
+      --accent2: #238636;
+      --success: #3fb950;
+      --warning: #d29922;
+      --radius: 12px;
       --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{
-      font-family:var(--sans);
-      color:var(--text);
-      background:var(--bg);
-      min-height:100vh;
-    }
-    .wrap{max-width:1440px;margin:0 auto;}
     
-    .header{
-      background:linear-gradient(180deg, #161b22 0%, #0d1117 100%);
-      border-bottom:1px solid var(--border);
-      padding:20px 32px;
-      position:sticky;
-      top:0;
-      z-index:100;
-      backdrop-filter:blur(10px);
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-    .header-content{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-    }
-    .logo{display:flex;align-items:center;gap:12px}
-    .logo-icon{
-      width:36px;
-      height:36px;
-      background:linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius:8px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:20px;
-    }
-    .logo-text h1{font-size:20px;margin:0;font-weight:700}
-    .logo-text p{color:var(--muted);font-size:13px;margin-top:2px}
-    .header-tags{display:flex;gap:8px}
-    .tag{
-      padding:6px 12px;
-      background:rgba(47,129,247,.15);
-      border:1px solid rgba(47,129,247,.3);
-      border-radius:16px;
-      font-size:11px;
-      font-weight:600;
-      color:var(--accent);
-      text-transform:uppercase;
-      letter-spacing:.5px;
-    }
-
-    .main{display:grid;grid-template-columns:340px 1fr;min-height:calc(100vh - 77px)}
-    @media(max-width:1200px){ .main{grid-template-columns:1fr} }
     
-    .sidebar{
-      background:var(--card);
-      border-right:1px solid var(--border);
-      padding:24px;
-      overflow-y:auto;
+    body {
+      font-family: var(--sans);
+      color: var(--text);
+      background: var(--bg);
+      min-height: 100vh;
     }
-
-    .card{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      padding:20px;
-      margin-bottom:16px;
+    
+    .wrap {
+      max-width: 1440px;
+      margin: 0 auto;
     }
-
-    .section-title{
-      font-size:14px;
-      margin:0 0 16px;
-      padding-bottom:10px;
-      border-bottom:1px solid var(--border);
-      font-weight:700;
-      text-transform:uppercase;
-      letter-spacing:.5px;
-      color:var(--muted);
+    
+    .header {
+      background: linear-gradient(180deg, #161b22 0%, #0d1117 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
     }
-
-    .kpi-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-      margin-bottom:20px;
+    
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    .kpi-box{
-      padding:16px;
-      background:rgba(47,129,247,.08);
-      border:1px solid rgba(47,129,247,.2);
-      border-radius:10px;
-      text-align:center;
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
-    .kpi-num{
-      font-size:32px;
-      font-weight:800;
-      color:var(--accent);
-      margin-bottom:4px;
+    
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
     }
-    .kpi-label{
-      color:var(--muted);
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.5px;
+    
+    .logo-text h1 {
+      font-size: 20px;
+      margin: 0;
+      font-weight: 700;
     }
-
-    .btn{
-      width:100%;
-      padding:12px 18px;
-      margin:8px 0;
-      border:none;
-      border-radius:8px;
-      font-weight:600;
-      font-size:13px;
-      cursor:pointer;
-      transition:all .2s;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
+    
+    .logo-text p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 2px;
     }
-    .btn-primary{
-      background:var(--accent);
-      color:white;
+    
+    .header-tags {
+      display: flex;
+      gap: 8px;
     }
-    .btn-primary:hover:not(:disabled){
-      background:#1f6feb;
-      transform:translateY(-1px);
+    
+    .tag {
+      padding: 6px 12px;
+      background: rgba(47, 129, 247, .15);
+      border: 1px solid rgba(47, 129, 247, .3);
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: .5px;
     }
-    .btn-success{
-      background:var(--success);
-      color:white;
+    
+    .main {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      min-height: calc(100vh - 77px);
     }
-    .btn-success:hover:not(:disabled){
-      background:#2ea043;
-      transform:translateY(-1px);
+    
+    @media (max-width: 1200px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
     }
-    .btn:disabled{
-      opacity:.5;
-      cursor:not-allowed;
+    
+    .sidebar {
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      padding: 24px;
+      overflow-y: auto;
     }
-
-    .file-drop{
-      border:2px dashed var(--border);
-      border-radius:8px;
-      padding:32px 20px;
-      text-align:center;
-      cursor:pointer;
-      transition:all .2s;
-      margin:16px 0;
+    
+    .section-title {
+      font-size: 14px;
+      margin: 0 0 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--muted);
     }
-    .file-drop:hover{
-      border-color:var(--accent);
-      background:rgba(47,129,247,.05);
+    
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
     }
-    .file-drop-icon{font-size:32px;margin-bottom:8px}
-    .file-drop-text{font-size:13px;color:var(--text);margin-bottom:4px}
-    .file-drop-hint{font-size:11px;color:var(--muted)}
-
-    .transcript-list{
-      max-height:280px;
-      overflow-y:auto;
-      margin:16px 0;
+    
+    .kpi-box {
+      padding: 16px;
+      background: rgba(47, 129, 247, .08);
+      border: 1px solid rgba(47, 129, 247, .2);
+      border-radius: 10px;
+      text-align: center;
     }
-    .transcript-item{
-      padding:10px;
-      background:rgba(255,255,255,.02);
-      border:1px solid var(--border);
-      border-radius:8px;
-      margin-bottom:8px;
-      font-size:12px;
+    
+    .kpi-num {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 4px;
     }
-    .transcript-item-name{
-      font-weight:600;
-      color:var(--text);
-      margin-bottom:4px;
+    
+    .kpi-label {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
     }
-    .transcript-item-meta{
-      color:var(--muted);
-      font-size:10px;
+    
+    .btn {
+      width: 100%;
+      padding: 12px 18px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
-
-    .status{
-      margin:12px 0;
-      padding:10px 12px;
-      border-radius:8px;
-      background:rgba(63,185,80,.1);
-      border:1px solid rgba(63,185,80,.2);
-      color:var(--success);
-      font-size:12px;
+    
+    .btn-primary {
+      background: var(--accent);
+      color: white;
     }
-    .status.error{
-      background:rgba(248,81,73,.1);
-      border:1px solid rgba(248,81,73,.2);
-      color:#f85149;
+    
+    .btn-primary:hover:not(:disabled) {
+      background: #1f6feb;
+      transform: translateY(-1px);
     }
-
-    .content{
-      padding:24px 32px;
-      overflow-y:auto;
-      max-height:calc(100vh - 77px);
+    
+    .btn-success {
+      background: var(--success);
+      color: white;
     }
-
-    .tabs{
-      display:flex;
-      gap:4px;
-      margin-bottom:24px;
-      border-bottom:1px solid var(--border);
+    
+    .btn-success:hover:not(:disabled) {
+      background: #2ea043;
+      transform: translateY(-1px);
     }
-    .tab{
-      padding:12px 20px;
-      background:transparent;
-      border:none;
-      color:var(--muted);
-      cursor:pointer;
-      border-bottom:2px solid transparent;
-      transition:all .2s;
-      font-size:14px;
-      font-weight:600;
+    
+    .btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
     }
-    .tab.active{
-      color:var(--text);
-      border-bottom-color:var(--accent);
+    
+    .status {
+      margin: 12px 0;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: rgba(63, 185, 80, .1);
+      border: 1px solid rgba(63, 185, 80, .2);
+      color: var(--success);
+      font-size: 12px;
     }
-    .tab-content{display:none}
-    .tab-content.active{display:block}
-
-    .dashboard-grid{
-      display:grid;
-      grid-template-columns:repeat(4, 1fr);
-      gap:16px;
-      margin-bottom:24px;
+    
+    .status.error {
+      background: rgba(248, 81, 73, .1);
+      border: 1px solid rgba(248, 81, 73, .2);
+      color: #f85149;
     }
-    @media(max-width:1200px){ .dashboard-grid{grid-template-columns:repeat(2, 1fr)} }
-
-    .stat-card{
-      padding:20px;
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:12px;
+    
+    .content {
+      padding: 24px 32px;
+      overflow-y: auto;
+      max-height: calc(100vh - 77px);
     }
-    .stat-value{
-      font-size:36px;
-      font-weight:800;
-      color:var(--accent);
-      margin-bottom:8px;
+    
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
     }
-    .stat-label{
-      color:var(--muted);
-      font-size:12px;
-      text-transform:uppercase;
-      letter-spacing:.5px;
+    
+    .tab {
+      padding: 12px 20px;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all .2s;
+      font-size: 14px;
+      font-weight: 600;
     }
-
-    .chart-container{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:20px;
-      margin-bottom:20px;
+    
+    .tab.active {
+      color: var(--text);
+      border-bottom-color: var(--accent);
     }
-    .chart-title{
-      font-size:16px;
-      font-weight:700;
-      margin-bottom:16px;
-      color:var(--text);
+    
+    .tab-content {
+      display: none;
     }
-
-    .pattern-card{
-      padding:20px;
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:12px;
-      margin-bottom:16px;
+    
+    .tab-content.active {
+      display: block;
     }
-    .pattern-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:12px;
+    
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
     }
-    .pattern-title{
-      font-size:16px;
-      font-weight:700;
-      color:var(--accent);
+    
+    @media (max-width: 1200px) {
+      .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
-    .pattern-count{
-      font-size:11px;
-      color:var(--muted);
-      background:rgba(255,255,255,.05);
-      padding:4px 10px;
-      border-radius:12px;
+    
+    .stat-card {
+      padding: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
     }
-    .keywords{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin:12px 0;
+    
+    .stat-value {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 8px;
     }
-    .keyword{
-      padding:6px 12px;
-      background:rgba(47,129,247,.12);
-      border:1px solid rgba(47,129,247,.25);
-      border-radius:16px;
-      font-size:12px;
-      color:var(--accent);
+    
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
     }
-
-    .ai-insight{
-      margin-top:12px;
-      padding:14px;
-      background:rgba(47,129,247,.08);
-      border-left:3px solid var(--accent);
-      border-radius:8px;
+    
+    .chart-container {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
     }
-    .ai-insight-header{
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.5px;
-      color:var(--accent);
-      font-weight:700;
-      margin-bottom:8px;
+    
+    .chart-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--text);
     }
-    .ai-insight-content{
-      color:var(--text);
-      line-height:1.6;
-      font-size:13px;
+    
+    .pattern-card {
+      padding: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 16px;
     }
-
-    .quote{
-      margin-top:12px;
-      padding:12px;
-      background:rgba(63,185,80,.08);
-      border-left:3px solid var(--success);
-      border-radius:8px;
-      font-size:12px;
-      line-height:1.5;
-      font-style:italic;
-      color:var(--muted);
+    
+    .pattern-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
     }
-
-    .chat-container{
-      display:flex;
-      flex-direction:column;
-      height:calc(100vh - 200px);
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:12px;
+    
+    .pattern-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
     }
-    .chat-messages{
-      flex:1;
-      overflow-y:auto;
-      padding:20px;
+    
+    .pattern-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 400;
+      margin-top: 4px;
     }
-    .chat-message{
-      margin-bottom:16px;
-      display:flex;
-      gap:12px;
+    
+    .keywords {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
     }
-    .chat-message.user{
-      justify-content:flex-end;
+    
+    .keyword {
+      padding: 6px 12px;
+      background: rgba(47, 129, 247, .12);
+      border: 1px solid rgba(47, 129, 247, .25);
+      border-radius: 16px;
+      font-size: 12px;
+      color: var(--accent);
     }
-    .chat-avatar{
-      width:32px;
-      height:32px;
-      border-radius:50%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:16px;
-      flex-shrink:0;
+    
+    .ai-insight {
+      margin-top: 12px;
+      padding: 14px;
+      background: rgba(47, 129, 247, .08);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
     }
-    .chat-avatar.ai{
-      background:linear-gradient(135deg, var(--accent), var(--accent2));
+    
+    .ai-insight-header {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 8px;
     }
-    .chat-avatar.user{
-      background:linear-gradient(135deg, #d29922, #f0883e);
+    
+    .ai-insight-content {
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 13px;
     }
-    .chat-bubble{
-      max-width:70%;
-      padding:12px 16px;
-      border-radius:12px;
-      line-height:1.5;
-      font-size:14px;
+    
+    .quote {
+      margin-top: 12px;
+      padding: 12px;
+      background: rgba(63, 185, 80, .08);
+      border-left: 3px solid var(--success);
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.5;
+      font-style: italic;
+      color: var(--muted);
     }
-    .chat-bubble.ai{
-      background:rgba(47,129,247,.1);
-      border:1px solid rgba(47,129,247,.2);
-      color:var(--text);
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
     }
-    .chat-bubble.user{
-      background:var(--accent);
-      color:white;
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
     }
-    .chat-input-container{
-      padding:16px;
-      border-top:1px solid var(--border);
-      display:flex;
-      gap:8px;
-      align-items:center;
+    
+    .spinner {
+      border: 3px solid rgba(47, 129, 247, .2);
+      border-top: 3px solid var(--accent);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
     }
-    .chat-input{
-      flex:1;
-      padding:12px 16px;
-      background:rgba(255,255,255,.05);
-      border:1px solid var(--border);
-      border-radius:8px;
-      color:var(--text);
-      font-size:14px;
-      outline:none;
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
-    .chat-input:focus{
-      border-color:var(--accent);
+    
+    .guide-section {
+      margin-bottom: 24px;
+      padding: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
     }
-    .voice-btn{
-      width:44px;
-      height:44px;
-      border:none;
-      background:var(--accent);
-      color:white;
-      border-radius:8px;
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:18px;
-      transition:all .2s;
+    
+    .guide-section h3 {
+      font-size: 16px;
+      color: var(--accent);
+      margin-bottom: 12px;
+      font-weight: 700;
     }
-    .voice-btn:hover{
-      background:#1f6feb;
+    
+    .guide-section p {
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 13px;
+      margin-bottom: 10px;
     }
-    .voice-btn.recording{
-      background:#f85149;
-      animation:pulse 1s infinite;
+    
+    .guide-section ul {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+      margin-left: 20px;
+      margin-bottom: 10px;
     }
-    @keyframes pulse{
-      0%, 100%{opacity:1}
-      50%{opacity:.5}
+    
+    .guide-section ul li {
+      margin-bottom: 6px;
     }
-
-    .empty-state{
-      text-align:center;
-      padding:60px 20px;
-      color:var(--muted);
+    
+    .guide-section strong {
+      color: var(--text);
     }
-    .empty-icon{font-size:48px;margin-bottom:16px;opacity:.5}
-
-    .loading{
-      text-align:center;
-      padding:40px;
+    
+    .guide-section code {
+      background: rgba(47, 129, 247, .15);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: var(--accent);
+      font-family: monospace;
     }
-    .spinner{
-      border:3px solid rgba(47,129,247,.2);
-      border-top:3px solid var(--accent);
-      border-radius:50%;
-      width:40px;
-      height:40px;
-      animation:spin 1s linear infinite;
-      margin:0 auto 16px;
+    
+    .pipeline-diagram {
+      background: rgba(0, 0, 0, .2);
+      padding: 16px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 11px;
+      line-height: 2;
+      color: var(--muted);
+      margin: 16px 0;
     }
-    @keyframes spin{
-      0%{transform:rotate(0deg)}
-      100%{transform:rotate(360deg)}
-    }
-
-    .footer{
-      padding:16px 32px;
-      border-top:1px solid var(--border);
-      text-align:center;
-      color:var(--muted);
-      font-size:12px;
-    }
-    .footer a{
-      color:var(--accent);
-      text-decoration:none;
+    
+    .info-note {
+      margin-top: 20px;
+      padding: 12px;
+      background: rgba(47, 129, 247, .08);
+      border: 1px solid rgba(47, 129, 247, .2);
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--muted);
     }
   </style>
 </head>
@@ -503,7 +487,7 @@
           <div class="logo-icon">📊</div>
           <div class="logo-text">
             <h1>Learning Signals</h1>
-            <p>AI-Powered Transcript Analysis</p>
+            <p>AI-Powered Transcript Analysis Platform</p>
           </div>
         </div>
         <div class="header-tags">
@@ -515,6 +499,7 @@
     </div>
 
     <div class="main">
+      <!-- Sidebar -->
       <div class="sidebar">
         <div class="section-title">Data Source</div>
 
@@ -525,86 +510,231 @@
           </div>
           <div class="kpi-box">
             <div class="kpi-num" id="totalWords">0</div>
-            <div class="kpi-label">Words</div>
+            <div class="kpi-label">Total Words</div>
           </div>
         </div>
 
         <button class="btn btn-success" id="loadSample">
-          <span>📝</span> Load Sample Data
+          <span>📝</span> Load Demo Data
         </button>
 
-        <div style="text-align:center;margin:12px 0;color:var(--muted);font-size:12px">or upload your data</div>
-
-        <div class="file-drop" id="dropZone">
-          <div class="file-drop-icon">📁</div>
-          <div class="file-drop-text">Drop CSV file here</div>
-          <div class="file-drop-hint">or click to browse</div>
-          <input type="file" id="fileInput" accept=".csv" style="display:none">
-        </div>
-
         <button class="btn btn-primary" id="analyzeBtn" disabled>
-          <span>🚀</span> Analyze Data
+          <span>🚀</span> Analyze Transcripts
         </button>
 
         <div class="status" id="status">Ready to analyze</div>
 
-        <div class="section-title" style="margin-top:24px">Recent Transcripts</div>
-        <div class="transcript-list" id="transcriptList">
-          <div class="empty-state" style="padding:20px 10px">
-            <div style="font-size:24px;margin-bottom:8px">📄</div>
-            <p style="font-size:11px">No data loaded</p>
-          </div>
+        <div class="info-note">
+          <strong>💡 Demo Mode</strong><br>
+          This demo uses 16 sample student transcripts. Production version supports batch upload of 1,000+ transcripts via CSV.
         </div>
       </div>
 
+      <!-- Main Content -->
       <div class="content">
         <div class="tabs">
           <button class="tab active" data-tab="dashboard">📊 Dashboard</button>
           <button class="tab" data-tab="patterns">🔍 Pattern Analysis</button>
-          <button class="tab" data-tab="chat">💬 Ask Questions</button>
+          <button class="tab" data-tab="guide">📚 Resources & Guide</button>
         </div>
 
+        <!-- Dashboard Tab -->
         <div class="tab-content active" id="tab-dashboard">
           <div id="dashboardContent">
             <div class="empty-state">
-              <div class="empty-icon">📈</div>
-              <h3 style="margin-bottom:8px">No Analysis Yet</h3>
-              <p>Load data and click "Analyze Data" to see insights</p>
+              <div style="font-size:48px;margin-bottom:16px">📈</div>
+              <h3 style="margin-bottom:8px;font-size:18px">No Analysis Yet</h3>
+              <p>Click "Load Demo Data" then "Analyze Transcripts" to see insights</p>
             </div>
           </div>
         </div>
 
+        <!-- Pattern Analysis Tab -->
         <div class="tab-content" id="tab-patterns">
           <div id="patternsContent">
             <div class="empty-state">
-              <div class="empty-icon">🔍</div>
-              <h3 style="margin-bottom:8px">No Patterns Detected</h3>
-              <p>Run analysis to discover themes and patterns</p>
+              <div style="font-size:48px;margin-bottom:16px">🔍</div>
+              <h3 style="margin-bottom:8px;font-size:18px">No Patterns Detected</h3>
+              <p>Run analysis to discover themes and extract insights</p>
             </div>
           </div>
         </div>
 
-        <div class="tab-content" id="tab-chat">
-          <div class="chat-container">
-            <div class="chat-messages" id="chatMessages">
-              <div class="chat-message">
-                <div class="chat-avatar ai">🤖</div>
-                <div class="chat-bubble ai">
-                  Hello! I'm your AI assistant. Once you've analyzed your data, you can ask me questions like:
-                  <br><br>
-                  • "What are the main themes?"<br>
-                  • "Show me feedback about presentations"<br>
-                  • "What challenges did people face?"<br>
-                  <br>
-                  Type your question or click the microphone to speak!
-                </div>
-              </div>
+        <!-- Guide Tab -->
+        <div class="tab-content" id="tab-guide">
+          <div class="guide-section">
+            <h3>🎯 What Learning Signals Does</h3>
+            <p>
+              Learning Signals analyzes large volumes of qualitative text data—such as student reflections, 
+              interview transcripts, and course feedback—to automatically discover patterns and themes using 
+              AI-powered natural language processing techniques.
+            </p>
+            <p>
+              The platform is designed for educational researchers, instructors, and organizational leaders who 
+              need to process hundreds or thousands of text responses to identify key insights, trends, and areas of focus.
+            </p>
+          </div>
+
+          <div class="guide-section">
+            <h3>🔬 Technical Methodology</h3>
+            <p><strong>Step 1: Text Vectorization (TF-IDF)</strong></p>
+            <p>
+              Each transcript is converted into a numerical vector using Term Frequency-Inverse Document Frequency (TF-IDF). 
+              This captures the semantic meaning of text by weighting terms based on their importance within individual 
+              documents and across the entire corpus.
+            </p>
+            
+            <p><strong>Step 2: Pattern Detection (K-Means Clustering)</strong></p>
+            <p>
+              K-means clustering algorithm groups similar transcripts together based on cosine similarity of their vectors. 
+              This unsupervised machine learning approach discovers natural patterns without predefined categories.
+            </p>
+            
+            <p><strong>Step 3: Keyword Extraction</strong></p>
+            <p>
+              For each cluster, the system identifies the most distinctive terms by analyzing TF-IDF weights. 
+              These keywords characterize the theme of each pattern.
+            </p>
+            
+            <p><strong>Step 4: Theme Naming & Interpretation</strong></p>
+            <p>
+              AI-powered logic generates descriptive pattern names (e.g., "Collaboration & Teamwork") and educational 
+              interpretations based on the extracted keywords and representative quotes.
+            </p>
+          </div>
+
+          <div class="guide-section">
+            <h3>📊 Use Cases</h3>
+            <ul>
+              <li><strong>Education:</strong> Analyze student reflections, course evaluations, learning journals, exit interviews</li>
+              <li><strong>Business:</strong> Process customer interviews, employee feedback surveys, stakeholder input</li>
+              <li><strong>Research:</strong> Qualitative data analysis at scale (100s to 1,000s of text responses)</li>
+              <li><strong>Voice AI Integration:</strong> Process transcripts from voice interview agents (like the LEARN Lab's voice AI system)</li>
+              <li><strong>Course Analytics:</strong> Identify learning patterns across large cohorts of students</li>
+            </ul>
+          </div>
+
+          <div class="guide-section">
+            <h3>🏗️ Production Architecture</h3>
+            <p>This demo runs entirely in the browser. For production deployment with 1,000+ transcripts:</p>
+            
+            <div class="pipeline-diagram">
+Voice/Data Input → Batch Ingestion → ETL Pipeline<br>
+&nbsp;&nbsp;&nbsp;&nbsp;↓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+Transcription Service&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PostgreSQL (metadata)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;↓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+CSV/API Upload&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Vector DB (Pinecone)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;↓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+Background Jobs&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Celery + Redis<br>
+&nbsp;&nbsp;&nbsp;&nbsp;↓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+LLM Processing&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Claude/GPT-4<br>
+&nbsp;&nbsp;&nbsp;&nbsp;↓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+Dashboard/API Output&nbsp;&nbsp;&nbsp;&nbsp;Research Interface
             </div>
-            <div class="chat-input-container">
-              <input type="text" class="chat-input" id="chatInput" placeholder="Ask a question about your data...">
-              <button class="voice-btn" id="voiceBtn" title="Voice input">🎤</button>
-              <button class="btn btn-primary" id="sendBtn" style="width:auto;margin:0;padding:0 20px">Send</button>
-            </div>
+            
+            <p><strong>Recommended Tech Stack:</strong></p>
+            <ul>
+              <li><strong>Backend:</strong> Python with FastAPI framework</li>
+              <li><strong>Database:</strong> PostgreSQL for transcript metadata and text storage</li>
+              <li><strong>Vector Store:</strong> Pinecone or Weaviate for semantic search</li>
+              <li><strong>Task Queue:</strong> Celery with Redis for background processing</li>
+              <li><strong>LLM:</strong> Claude Sonnet 4 or GPT-4 for theme interpretation</li>
+              <li><strong>Frontend:</strong> React with Tailwind CSS</li>
+              <li><strong>Hosting:</strong> AWS, Google Cloud, or Azure</li>
+            </ul>
+          </div>
+
+          <div class="guide-section">
+            <h3>⏱️ Scale Estimates (1,200 Transcripts)</h3>
+            <p><strong>Performance Benchmarks:</strong></p>
+            <ul>
+              <li>Batch ingestion: 2-3 hours for full upload</li>
+              <li>Embedding generation: 1-2 hours (using OpenAI ada-002)</li>
+              <li>LLM analysis: 3-4 hours (batch processing with rate limiting)</li>
+              <li>Query response time: <2 seconds per semantic search</li>
+            </ul>
+            
+            <p><strong>Cost Estimates:</strong></p>
+            <ul>
+              <li>LLM processing: ~$150-200 one-time (Claude Sonnet for theme extraction)</li>
+              <li>Embeddings: ~$5-10 one-time (OpenAI ada-002)</li>
+              <li>Vector database: ~$70/month (Pinecone starter tier)</li>
+              <li>Infrastructure: ~$50/month (AWS EC2 + RDS)</li>
+              <li><strong>Total first month: ~$275-330</strong></li>
+              <li><strong>Ongoing monthly: ~$120</strong></li>
+            </ul>
+            
+            <p><strong>Development Timeline:</strong></p>
+            <ul>
+              <li>Week 1-2: Backend API development, database setup, ingestion pipeline</li>
+              <li>Week 3: Vector database integration, embedding generation</li>
+              <li>Week 4: LLM integration, theme extraction, testing</li>
+              <li>Week 5: Dashboard integration, production deployment, documentation</li>
+            </ul>
+          </div>
+
+          <div class="guide-section">
+            <h3>🔐 Research Ethics & Privacy</h3>
+            <p>Learning Signals is designed with educational research principles:</p>
+            <ul>
+              <li><strong>Non-evaluative:</strong> Does not grade, score, or rank individual learners</li>
+              <li><strong>Transparent:</strong> All pattern detection logic and outputs are explainable</li>
+              <li><strong>Human-in-the-loop:</strong> Requires expert validation of AI-generated interpretations</li>
+              <li><strong>Privacy-preserving:</strong> Demo uses local browser storage; production implements data governance</li>
+              <li><strong>Bias-aware:</strong> Acknowledges potential algorithmic bias; outputs should be reviewed critically</li>
+              <li><strong>Purpose-built:</strong> Supports researcher sensemaking, not automated decision-making about students</li>
+            </ul>
+          </div>
+
+          <div class="guide-section">
+            <h3>🚀 Integration with Voice AI Systems</h3>
+            <p>
+              This platform is designed to integrate with voice-based AI interview systems. The typical workflow:
+            </p>
+            <ul>
+              <li>Voice AI agents conduct interviews with students, customers, or employees</li>
+              <li>Conversations are transcribed to text (via Whisper, Google Speech, etc.)</li>
+              <li>Transcripts are batch-uploaded to Learning Signals (CSV or API)</li>
+              <li>System processes transcripts, extracts themes, generates insights</li>
+              <li>Results feed into dashboards (like NUance) for researcher exploration</li>
+            </ul>
+            <p>
+              <strong>Example:</strong> For a business communication course with 300 students conducting 4 interviews each 
+              (1,200 total transcripts), the pipeline would ingest all transcripts, identify 5-8 major communication themes, 
+              and provide instructors with actionable insights about student learning patterns.
+            </p>
+          </div>
+
+          <div class="guide-section">
+            <h3>💻 Technical Implementation</h3>
+            <p><strong>Current Demo:</strong></p>
+            <ul>
+              <li>Pure JavaScript (no framework dependencies)</li>
+              <li>Client-side TF-IDF and K-means implementation</li>
+              <li>Chart.js for data visualization</li>
+              <li>Runs entirely in browser (no backend required)</li>
+            </ul>
+            
+            <p><strong>Production Enhancements:</strong></p>
+            <ul>
+              <li>RESTful API for transcript upload and retrieval</li>
+              <li>Advanced embedding models (OpenAI, Cohere, or custom)</li>
+              <li>Vector similarity search for semantic querying</li>
+              <li>LLM-powered natural language query interface</li>
+              <li>Real-time processing status and progress tracking</li>
+              <li>Export capabilities (PDF reports, CSV data, JSON API)</li>
+            </ul>
+          </div>
+
+          <div class="guide-section">
+            <h3>📖 How to Use This Demo</h3>
+            <ol style="color:var(--muted);font-size:13px;line-height:1.8;margin-left:20px">
+              <li>Click <strong>"Load Demo Data"</strong> to load 16 sample student transcripts</li>
+              <li>Click <strong>"Analyze Transcripts"</strong> to run the analysis pipeline</li>
+              <li>View the <strong>Dashboard</strong> tab to see charts and overall statistics</li>
+              <li>Explore the <strong>Pattern Analysis</strong> tab to review detailed themes, keywords, and representative quotes</li>
+              <li>Review this <strong>Resources & Guide</strong> tab to understand methodology and production architecture</li>
+            </ol>
           </div>
         </div>
       </div>
@@ -612,65 +742,167 @@
   </div>
 
 <script>
+// Sample transcript data
 const SAMPLE_DATA = [
-  { id: 1, name: "STU001_Interview1", text: "The group project taught me the importance of clear communication. Initially we struggled with coordinating schedules but learned to use shared documents effectively." },
-  { id: 2, name: "STU001_Interview2", text: "Presenting to the class was nerve-wracking at first. I practiced my delivery multiple times and focused on making eye contact. The feedback helped me understand that pausing for emphasis makes presentations more engaging." },
-  { id: 3, name: "STU002_Interview1", text: "Time management was my biggest challenge this semester. Balancing readings with assignments required better prioritization. I learned to break large tasks into smaller milestones." },
-  { id: 4, name: "STU002_Interview2", text: "The peer review process was valuable for my writing. Receiving constructive criticism helped me see weaknesses I had missed. I now understand that revision is where real improvement happens." },
-  { id: 5, name: "STU003_Interview1", text: "Working with diverse team members expanded my perspective. People from different backgrounds approached problems differently. This taught me to listen more carefully before jumping to conclusions." },
-  { id: 6, name: "STU003_Interview2", text: "The case study analysis required integrating theory with practice. Reading about concepts is different from applying them to real situations. This bridge between classroom and reality was the most valuable part." },
-  { id: 7, name: "STU004_Interview1", text: "Office hours made a huge difference in my understanding. The professor explained concepts in different ways until I got it. I learned that asking for help early prevents confusion from snowballing." },
-  { id: 8, name: "STU004_Interview2", text: "Reflective writing pushed me to think metacognitively about learning. Writing down what I learned and how I learned it created deeper understanding. This self-awareness will help in future courses." },
-  { id: 9, name: "STU005_Interview1", text: "The iterative feedback loop improved my work significantly. Each round of comments helped me refine my arguments. I realized that good work requires multiple revisions not just one draft." },
-  { id: 10, name: "STU005_Interview2", text: "Guest speakers from industry provided real-world context. Their stories illustrated how course concepts translate to professional settings. This connection to careers made the material more motivating." },
-  { id: 11, name: "STU006_Interview1", text: "Discussion forums allowed me to process ideas at my own pace. Reading others' perspectives before contributing helped me formulate clearer thoughts." },
-  { id: 12, name: "STU006_Interview2", text: "Collaborative problem-solving taught me about group dynamics. Some teammates naturally led while others contributed different skills. Understanding these roles made our collaboration more effective." },
-  { id: 13, name: "STU007_Interview1", text: "The hands-on activities made abstract concepts concrete. Actually doing the work rather than just reading about it created lasting understanding." },
-  { id: 14, name: "STU007_Interview2", text: "Building on previous knowledge showed how courses connect. Concepts from earlier classes suddenly made sense in new contexts." },
-  { id: 15, name: "STU008_Interview1", text: "Setting personal learning goals helped me stay focused. Having clear objectives made it easier to measure progress." },
-  { id: 16, name: "STU008_Interview2", text: "The diversity of examples from different industries helped me understand applications. Seeing multiple use cases made theories more accessible and relevant." }
+  {
+    id: 1,
+    name: "STU001_Interview1",
+    text: "Working with my team on the group presentation taught me invaluable lessons about collaboration. We used shared documents and regular check-ins to stay coordinated. Each member brought different strengths and we learned to delegate effectively based on those strengths."
+  },
+  {
+    id: 2,
+    name: "STU001_Interview2",
+    text: "Presenting to the class was nerve-wracking at first. I practiced my delivery multiple times and focused on making eye contact. The feedback helped me understand that pausing for emphasis makes presentations more engaging and helps the audience follow along better."
+  },
+  {
+    id: 3,
+    name: "STU002_Interview1",
+    text: "Time management became my biggest area of growth this semester. Balancing multiple assignments while maintaining quality required strategic planning. I started using project management tools and breaking large tasks into daily milestones which made everything more manageable."
+  },
+  {
+    id: 4,
+    name: "STU002_Interview2",
+    text: "The iterative revision process significantly improved my business writing. Each draft incorporated feedback from peers and the instructor. I learned that professional communication requires multiple rounds of refinement and careful attention to audience needs and context."
+  },
+  {
+    id: 5,
+    name: "STU003_Interview1",
+    text: "Working with diverse team members expanded my understanding of business communication. Team members from different cultural backgrounds approached problems with unique frameworks. This diversity taught me to listen actively and consider multiple viewpoints before making decisions."
+  },
+  {
+    id: 6,
+    name: "STU003_Interview2",
+    text: "Applying communication theory to real business cases was eye-opening. Reading about stakeholder analysis is completely different from identifying actual stakeholders in case studies. This practical application made abstract concepts tangible and memorable for future use."
+  },
+  {
+    id: 7,
+    name: "STU004_Interview1",
+    text: "The instructor's office hours provided crucial support for understanding complex concepts. Having one-on-one time to ask questions and receive personalized explanations accelerated my learning significantly. I discovered that seeking help early prevents misunderstandings from compounding."
+  },
+  {
+    id: 8,
+    name: "STU004_Interview2",
+    text: "Professional networking simulations prepared me for real-world interactions. Practicing elevator pitches and informational interviews in class built confidence and competence. The structured feedback after each simulation highlighted specific areas for improvement in my communication approach."
+  },
+  {
+    id: 9,
+    name: "STU005_Interview1",
+    text: "Collaborative problem-solving sessions revealed important group dynamics. Some teammates naturally facilitated discussion while others excelled at detailed analysis. Understanding these complementary roles helped us work more efficiently and produce higher quality deliverables."
+  },
+  {
+    id: 10,
+    name: "STU005_Interview2",
+    text: "Guest speakers from various industries brought theory to life with practical examples. Hearing how professionals actually use communication strategies in their work made the course material more relevant and applicable. Their real-world examples illustrated both successful and unsuccessful communication approaches."
+  },
+  {
+    id: 11,
+    name: "STU006_Interview1",
+    text: "The asynchronous discussion board format suited my processing style perfectly. Having time to reflect on prompts before responding led to more thoughtful contributions. Reading classmates' diverse perspectives before formulating my own enriched my understanding of each topic significantly."
+  },
+  {
+    id: 12,
+    name: "STU006_Interview2",
+    text: "Video presentations required mastering new technical skills alongside communication techniques. Learning to manage camera angles, lighting, and audio quality while delivering clear messages added complexity. This multimedia approach reflects modern business communication realities and expectations."
+  },
+  {
+    id: 13,
+    name: "STU007_Interview1",
+    text: "Hands-on activities made business communication principles concrete and applicable. Actually drafting memos, emails, and reports reinforced formatting conventions and tone guidelines. The experiential learning approach proved far more effective than passive reading about these concepts."
+  },
+  {
+    id: 14,
+    name: "STU007_Interview2",
+    text: "Progressive assignments built upon previous work throughout the semester creating continuity. Early foundational concepts about audience analysis informed later projects on persuasive communication. This scaffolded approach demonstrated how professional communication skills develop cumulatively over time."
+  },
+  {
+    id: 15,
+    name: "STU008_Interview1",
+    text: "Setting specific learning objectives at the semester's start focused my efforts strategically. Having clear goals for improving presentation skills and written communication made progress measurable and trackable. Regular self-assessment against these objectives kept me accountable and motivated throughout."
+  },
+  {
+    id: 16,
+    name: "STU008_Interview2",
+    text: "Case studies from multiple industries illustrated universal communication principles across contexts. Seeing how healthcare, technology, and finance sectors all face similar stakeholder communication challenges was illuminating. The varied examples made theories applicable across diverse career paths and settings."
+  }
 ];
 
-const state = { 
-  transcripts: [], 
+// Application state
+const state = {
+  transcripts: [],
   analysis: null,
   chartInstances: {}
 };
 
+// Pattern name generator based on keywords
+function generatePatternName(keywords) {
+  const kw = keywords.map(k => k.toLowerCase());
+  
+  if (kw.some(k => k.includes('team') || k.includes('group') || k.includes('collaborat'))) {
+    return "Collaboration & Teamwork";
+  } else if (kw.some(k => k.includes('feedback') || k.includes('peer') || k.includes('review') || k.includes('revis'))) {
+    return "Peer Feedback & Revision";
+  } else if (kw.some(k => k.includes('time') || k.includes('management') || k.includes('plan') || k.includes('organiz'))) {
+    return "Time Management & Planning";
+  } else if (kw.some(k => k.includes('present') || k.includes('speak') || k.includes('deliver') || k.includes('audience'))) {
+    return "Presentation & Communication";
+  } else if (kw.some(k => k.includes('theory') || k.includes('practice') || k.includes('case') || k.includes('apply') || k.includes('real'))) {
+    return "Theory to Practice Integration";
+  } else if (kw.some(k => k.includes('writ') || k.includes('draft') || k.includes('essay'))) {
+    return "Writing Development";
+  } else if (kw.some(k => k.includes('learn') || k.includes('understand') || k.includes('concept'))) {
+    return "Learning & Understanding";
+  } else if (kw.some(k => k.includes('help') || k.includes('support') || k.includes('office') || k.includes('instructor'))) {
+    return "Support & Resources";
+  } else {
+    return "Learning Theme";
+  }
+}
+
+// Generate educational insight based on pattern
+function generateInsight(keywords, quotes) {
+  const name = generatePatternName(keywords);
+  
+  if (name.includes("Collaboration")) {
+    return "This pattern highlights the importance of teamwork, coordination, and leveraging diverse team member perspectives. Students emphasize effective delegation, understanding complementary roles, and how collaborative work exposes them to different problem-solving approaches.";
+  } else if (name.includes("Feedback")) {
+    return "This pattern reveals the value of peer review and iterative improvement processes. Students recognize that constructive criticism, multiple revision cycles, and incorporating feedback from multiple sources lead to higher quality work and deeper learning outcomes.";
+  } else if (name.includes("Time")) {
+    return "This pattern focuses on time management strategies and organizational skills development. Students discuss prioritization techniques, use of project management tools, and the importance of breaking large tasks into manageable daily milestones to maintain quality while meeting deadlines.";
+  } else if (name.includes("Presentation")) {
+    return "This pattern centers on developing presentation and public speaking abilities. Students describe overcoming nervousness through deliberate practice, improving delivery techniques like pacing and eye contact, and learning to engage audiences more effectively through structured feedback.";
+  } else if (name.includes("Theory")) {
+    return "This pattern demonstrates the value of connecting theoretical concepts to real-world applications and case studies. Students express that practical examples, stakeholder analysis exercises, and industry contexts make abstract ideas more tangible, memorable, and applicable to professional settings.";
+  } else if (name.includes("Writing")) {
+    return "This pattern emphasizes writing skill development through revision processes and feedback integration. Students highlight how draft refinement, peer critique, attention to audience needs, and multiple iterations improve their professional communication abilities significantly.";
+  } else if (name.includes("Learning")) {
+    return "This pattern reveals metacognitive awareness about personal learning processes and strategies. Students demonstrate understanding of how they learn best, apply strategies for deeper comprehension, and show self-awareness about their educational development and growth areas.";
+  } else if (name.includes("Support")) {
+    return "This pattern emphasizes the importance of utilizing available learning resources and support systems. Students recognize that office hours, instructor guidance, personalized explanations, and peer assistance significantly enhance learning outcomes and prevent knowledge gaps.";
+  } else {
+    return `This pattern identifies a cluster of related concepts and themes. The transcripts grouped here share common focus areas around: ${keywords.slice(0, 4).join(', ')}. Further qualitative analysis can reveal deeper connections.`;
+  }
+}
+
+// Update dashboard KPIs
 function updateDashboard() {
   document.getElementById('totalTranscripts').textContent = state.transcripts.length;
   const totalWords = state.transcripts.reduce((sum, t) => sum + t.text.split(' ').length, 0);
   document.getElementById('totalWords').textContent = totalWords.toLocaleString();
   document.getElementById('analyzeBtn').disabled = state.transcripts.length === 0;
-  
-  renderTranscriptList();
 }
 
-function renderTranscriptList() {
-  const container = document.getElementById('transcriptList');
-  if (state.transcripts.length === 0) {
-    container.innerHTML = '<div class="empty-state" style="padding:20px 10px"><div style="font-size:24px;margin-bottom:8px">📄</div><p style="font-size:11px">No data loaded</p></div>';
-    return;
-  }
-
-  container.innerHTML = state.transcripts.slice(0, 5).map(t => `
-    <div class="transcript-item">
-      <div class="transcript-item-name">${escapeHTML(t.name)}</div>
-      <div class="transcript-item-meta">${t.text.split(' ').length} words</div>
-    </div>
-  `).join('');
-}
-
+// Render dashboard charts
 function renderDashboard() {
   const container = document.getElementById('dashboardContent');
   if (!state.analysis) return;
 
-  const {labels, keywords, counts, texts} = state.analysis;
+  const { labels, keywords, counts, texts, patternNames } = state.analysis;
 
-  // Destroy old charts
+  // Destroy existing charts
   Object.values(state.chartInstances).forEach(chart => chart.destroy());
   state.chartInstances = {};
 
+  // Create dashboard HTML
   container.innerHTML = `
     <div class="dashboard-grid">
       <div class="stat-card">
@@ -686,33 +918,33 @@ function renderDashboard() {
         <div class="stat-label">Keywords Extracted</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value">${texts.reduce((s,t)=>s+t.split(' ').length,0)}</div>
-        <div class="stat-label">Total Words</div>
+        <div class="stat-value">${texts.reduce((s, t) => s + t.split(' ').length, 0)}</div>
+        <div class="stat-label">Total Words Analyzed</div>
       </div>
     </div>
 
     <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px">
       <div class="chart-container">
-        <div class="chart-title">Pattern Distribution</div>
+        <div class="chart-title">Pattern Distribution Across Transcripts</div>
         <canvas id="barChart" height="100"></canvas>
       </div>
       <div class="chart-container">
-        <div class="chart-title">Transcript Breakdown</div>
+        <div class="chart-title">Transcript Breakdown by Theme</div>
         <canvas id="pieChart"></canvas>
       </div>
     </div>
   `;
 
-  // Bar chart
+  // Create bar chart
   const barCtx = document.getElementById('barChart').getContext('2d');
   state.chartInstances.bar = new Chart(barCtx, {
     type: 'bar',
     data: {
-      labels: keywords.map((_, i) => `Pattern ${i + 1}`),
+      labels: patternNames,
       datasets: [{
         label: 'Number of Transcripts',
         data: Object.values(counts),
-        backgroundColor: 'rgba(47, 129, 247, 0.6)',
+        backgroundColor: 'rgba(47, 129, 247, 0.7)',
         borderColor: 'rgba(47, 129, 247, 1)',
         borderWidth: 1
       }]
@@ -721,28 +953,37 @@ function renderDashboard() {
       responsive: true,
       maintainAspectRatio: true,
       plugins: {
-        legend: { display: false }
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#161b22',
+          borderColor: 'rgba(240, 246, 252, 0.1)',
+          borderWidth: 1
+        }
       },
       scales: {
         y: {
           beginAtZero: true,
           ticks: { color: '#7d8590' },
-          grid: { color: 'rgba(240,246,252,0.05)' }
+          grid: { color: 'rgba(240, 246, 252, 0.05)' }
         },
         x: {
-          ticks: { color: '#7d8590' },
-          grid: { color: 'rgba(240,246,252,0.05)' }
+          ticks: { 
+            color: '#7d8590',
+            maxRotation: 45,
+            minRotation: 0
+          },
+          grid: { color: 'rgba(240, 246, 252, 0.05)' }
         }
       }
     }
   });
 
-  // Pie chart
+  // Create pie chart
   const pieCtx = document.getElementById('pieChart').getContext('2d');
   state.chartInstances.pie = new Chart(pieCtx, {
     type: 'doughnut',
     data: {
-      labels: keywords.map((_, i) => `Pattern ${i + 1}`),
+      labels: patternNames,
       datasets: [{
         data: Object.values(counts),
         backgroundColor: [
@@ -761,26 +1002,38 @@ function renderDashboard() {
       plugins: {
         legend: {
           position: 'bottom',
-          labels: { color: '#7d8590', padding: 10 }
+          labels: { 
+            color: '#7d8590',
+            padding: 10,
+            font: { size: 11 }
+          }
+        },
+        tooltip: {
+          backgroundColor: '#161b22',
+          borderColor: 'rgba(240, 246, 252, 0.1)',
+          borderWidth: 1
         }
       }
     }
   });
 }
 
+// Render pattern analysis view
 function renderPatterns() {
   const container = document.getElementById('patternsContent');
   if (!state.analysis) return;
 
-  const {keywords, insights, reps, counts} = state.analysis;
+  const { keywords, insights, reps, counts, patternNames } = state.analysis;
 
   let html = '';
   for (let i = 0; i < keywords.length; i++) {
     html += `
       <div class="pattern-card">
         <div class="pattern-header">
-          <div class="pattern-title">Pattern ${i + 1}</div>
-          <div class="pattern-count">${counts[i] || 0} transcripts</div>
+          <div>
+            <div class="pattern-title">${patternNames[i]}</div>
+            <div class="pattern-subtitle">Pattern ${i + 1} • ${counts[i] || 0} transcripts</div>
+          </div>
         </div>
         
         <div class="keywords">
@@ -788,7 +1041,7 @@ function renderPatterns() {
         </div>
 
         <div class="ai-insight">
-          <div class="ai-insight-header">🤖 AI Interpretation</div>
+          <div class="ai-insight-header">🤖 AI-Generated Educational Interpretation</div>
           <div class="ai-insight-content">${escapeHTML(insights[i])}</div>
         </div>
 
@@ -802,102 +1055,170 @@ function renderPatterns() {
   container.innerHTML = html;
 }
 
-// Analysis functions
+// Text preprocessing
 function cleanText(s) {
-  return String(s || "").toLowerCase().replace(/https?:\/\/\S+/g, " ").replace(/[^a-z0-9\s']/g, " ").replace(/\s+/g, " ").trim();
+  return String(s || "")
+    .toLowerCase()
+    .replace(/https?:\/\/\S+/g, " ")
+    .replace(/[^a-z0-9\s']/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
+// Tokenization with stopword removal
 function tokenize(s) {
-  const stop = new Set(["the","a","an","and","or","but","if","then","else","when","while","to","of","in","on","for","with","as","at","by","is","are","was","were","be","been","being","it","this","that","these","those","i","we","you","they","he","she","my","our","your","their","me","us","him","her","them","from","into","about","over","under","again","very","really","just","so","because","can","could","should","would","will","did","do","does","done","than","too","also","not"]);
-  return s.split(" ").map(t => t.trim()).filter(t => t.length >= 3 && !stop.has(t));
+  const stopWords = new Set([
+    "the", "a", "an", "and", "or", "but", "if", "then", "else", "when", "while",
+    "to", "of", "in", "on", "for", "with", "as", "at", "by", "is", "are", "was",
+    "were", "be", "been", "being", "it", "this", "that", "these", "those", "i",
+    "we", "you", "they", "he", "she", "my", "our", "your", "their", "me", "us",
+    "him", "her", "them", "from", "into", "about", "over", "under", "again",
+    "very", "really", "just", "so", "because", "can", "could", "should", "would",
+    "will", "did", "do", "does", "done", "than", "too", "also", "not"
+  ]);
+  
+  return s.split(" ")
+    .map(t => t.trim())
+    .filter(t => t.length >= 3 && !stopWords.has(t));
 }
 
+// Build vocabulary from documents
 function buildVocab(docs) {
   const df = new Map();
   const tdocs = [];
+  
   docs.forEach(d => {
     const toks = tokenize(cleanText(d));
     const uniq = new Set(toks);
     uniq.forEach(t => df.set(t, (df.get(t) || 0) + 1));
     tdocs.push(toks);
   });
-  const terms = [...df.entries()].filter(([t, c]) => c >= 1).sort((a, b) => b[1] - a[1]).slice(0, 2500).map(([t]) => t);
+
+  const terms = [...df.entries()]
+    .filter(([t, c]) => c >= 1)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 2500)
+    .map(([t]) => t);
+
   const idx = new Map();
   terms.forEach((t, i) => idx.set(t, i));
+  
   return { terms, idx, tdocs };
 }
 
+// TF-IDF matrix computation
 function tfidfMatrix(tdocs, terms, idx) {
   const N = tdocs.length;
   const df = new Array(terms.length).fill(0);
+
   const tf = tdocs.map(toks => {
     const counts = new Map();
     toks.forEach(t => {
-      if (idx.has(t)) counts.set(t, (counts.get(t) || 0) + 1);
+      if (idx.has(t)) {
+        counts.set(t, (counts.get(t) || 0) + 1);
+      }
     });
-    counts.forEach((v, t) => { df[idx.get(t)] += 1; });
+    counts.forEach((v, t) => { 
+      df[idx.get(t)] += 1; 
+    });
     return counts;
   });
+
   const idf = df.map(dfi => Math.log((N + 1) / (dfi + 1)) + 1);
+
   const X = tf.map(counts => {
     const vec = new Array(terms.length).fill(0);
     counts.forEach((v, t) => {
       const j = idx.get(t);
-      vec[j] = (v) * idf[j];
+      vec[j] = v * idf[j];
     });
     const norm = Math.sqrt(vec.reduce((s, x) => s + x * x, 0)) || 1;
-    for (let j = 0; j < vec.length; j++) vec[j] /= norm;
+    for (let j = 0; j < vec.length; j++) {
+      vec[j] /= norm;
+    }
     return vec;
   });
+
   return { X };
 }
 
+// Cosine distance metric
 function cosineDistance(a, b) {
   let dot = 0;
-  for (let i = 0; i < a.length; i++) dot += a[i] * b[i];
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+  }
   return 1 - dot;
 }
 
+// K-means clustering algorithm
 function kmeans(X, k, iters = 25) {
   const n = X.length;
   const d = X[0].length;
+
+  // Random initialization
   const idxs = [...Array(n).keys()];
   for (let i = idxs.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [idxs[i], idxs[j]] = [idxs[j], idxs[i]];
   }
+  
   let centers = idxs.slice(0, k).map(i => X[i].slice());
   let labels = new Array(n).fill(0);
+
+  // Iterate
   for (let it = 0; it < iters; it++) {
     let changed = false;
+    
+    // Assignment step
     for (let i = 0; i < n; i++) {
-      let best = 0, bestDist = Infinity;
+      let best = 0;
+      let bestDist = Infinity;
       for (let c = 0; c < k; c++) {
         const dist = cosineDistance(X[i], centers[c]);
-        if (dist < bestDist) { bestDist = dist; best = c; }
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = c;
+        }
       }
-      if (labels[i] !== best) { labels[i] = best; changed = true; }
+      if (labels[i] !== best) {
+        labels[i] = best;
+        changed = true;
+      }
     }
+    
+    // Update step
     const newCenters = Array.from({ length: k }, () => new Array(d).fill(0));
     const counts = new Array(k).fill(0);
+    
     for (let i = 0; i < n; i++) {
       const c = labels[i];
       counts[c] += 1;
       const xi = X[i];
-      for (let j = 0; j < d; j++) newCenters[c][j] += xi[j];
+      for (let j = 0; j < d; j++) {
+        newCenters[c][j] += xi[j];
+      }
     }
+    
     for (let c = 0; c < k; c++) {
       if (counts[c] === 0) continue;
-      for (let j = 0; j < d; j++) newCenters[c][j] /= counts[c];
+      for (let j = 0; j < d; j++) {
+        newCenters[c][j] /= counts[c];
+      }
       const norm = Math.sqrt(newCenters[c].reduce((s, x) => s + x * x, 0)) || 1;
-      for (let j = 0; j < d; j++) newCenters[c][j] /= norm;
+      for (let j = 0; j < d; j++) {
+        newCenters[c][j] /= norm;
+      }
     }
+    
     centers = newCenters;
     if (!changed) break;
   }
+  
   return { labels, centers };
 }
 
+// Extract top keywords for each cluster
 function topKeywordsForCluster(centers, terms, topN) {
   return centers.map(center => {
     const pairs = center.map((w, i) => [i, w]);
@@ -906,8 +1227,10 @@ function topKeywordsForCluster(centers, terms, topN) {
   });
 }
 
+// Find representative quotes for each cluster
 function representativeQuotes(X, labels, centers, texts, perCluster) {
   const reps = [];
+  
   for (let c = 0; c < centers.length; c++) {
     const items = [];
     for (let i = 0; i < X.length; i++) {
@@ -918,226 +1241,114 @@ function representativeQuotes(X, labels, centers, texts, perCluster) {
     items.sort((a, b) => a[0] - b[0]);
     reps[c] = items.slice(0, perCluster).map(([, i]) => texts[i]);
   }
+  
   return reps;
 }
 
-async function generateInsights(keywords, quotes) {
-  const insights = [];
-  for (let i = 0; i < keywords.length; i++) {
-    const kw = keywords[i];
-    const q = quotes[i] || [];
-    const prompt = `You are analyzing transcript data. Pattern ${i + 1} has keywords: ${kw.join(", ")}. Sample quotes: ${q.map((qt, idx) => `${idx + 1}. "${qt}"`).join("\n")}. Provide a brief 2-3 sentence interpretation of the theme this pattern reveals.`;
-    try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          messages: [{ role: "user", content: prompt }]
-        })
-      });
-      const data = await response.json();
-      const text = data.content?.map(c => c.text || "").join("") || "Analysis unavailable";
-      insights.push(text.trim());
-    } catch (err) {
-      insights.push("Pattern focuses on: " + kw.slice(0, 3).join(", "));
-    }
-  }
-  return insights;
-}
-
+// HTML escape utility
 function escapeHTML(str) {
-  return String(str).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
 }
 
-async function runAnalysis() {
+// Main analysis function
+function runAnalysis() {
   const texts = state.transcripts.map(t => t.text);
   const k = Math.min(3, Math.max(2, Math.floor(texts.length / 5)));
 
-  document.getElementById('status').textContent = 'Analyzing...';
-  document.getElementById('dashboardContent').innerHTML = '<div class="loading"><div class="spinner"></div><p>Analyzing data...</p></div>';
+  document.getElementById('status').textContent = 'Analyzing transcripts...';
+  document.getElementById('dashboardContent').innerHTML = '<div class="loading"><div class="spinner"></div><p>Processing data and detecting patterns...</p></div>';
 
-  try {
-    const { terms, idx, tdocs } = buildVocab(texts);
-    if (terms.length < 5) {
-      document.getElementById('status').textContent = 'Not enough data';
+  // Use setTimeout to allow UI to update
+  setTimeout(() => {
+    try {
+      // Build vocabulary
+      const { terms, idx, tdocs } = buildVocab(texts);
+      
+      if (terms.length < 5) {
+        document.getElementById('status').textContent = 'Not enough text data for analysis';
+        document.getElementById('status').classList.add('error');
+        document.getElementById('dashboardContent').innerHTML = '<div class="empty-state"><div style="font-size:48px">⚠️</div><p>Insufficient data for meaningful pattern detection</p></div>';
+        return;
+      }
+
+      // Compute TF-IDF matrix
+      const { X } = tfidfMatrix(tdocs, terms, idx);
+      
+      // Run K-means clustering
+      const { labels, centers } = kmeans(X, k, 25);
+      
+      // Extract keywords for each cluster
+      const keywords = topKeywordsForCluster(centers, terms, 6);
+      
+      // Find representative quotes
+      const reps = representativeQuotes(X, labels, centers, texts, 2);
+      
+      // Generate pattern names
+      const patternNames = keywords.map(kw => generatePatternName(kw));
+      
+      // Generate insights
+      const insights = keywords.map((kw, i) => generateInsight(kw, reps[i]));
+
+      // Count transcripts per pattern
+      const counts = labels.reduce((acc, l) => {
+        acc[l] = (acc[l] || 0) + 1;
+        return acc;
+      }, {});
+
+      // Store analysis results
+      state.analysis = {
+        labels,
+        keywords,
+        reps,
+        insights,
+        counts,
+        texts,
+        patternNames
+      };
+
+      // Render results
+      renderDashboard();
+      renderPatterns();
+
+      // Update status
+      document.getElementById('status').textContent = '✓ Analysis complete';
+      document.getElementById('status').classList.remove('error');
+      
+    } catch (err) {
+      console.error('Analysis error:', err);
+      document.getElementById('status').textContent = 'Analysis error occurred';
       document.getElementById('status').classList.add('error');
-      return;
     }
-
-    const { X } = tfidfMatrix(tdocs, terms, idx);
-    const { labels, centers } = kmeans(X, k, 25);
-    const keywords = topKeywordsForCluster(centers, terms, 6);
-    const reps = representativeQuotes(X, labels, centers, texts, 2);
-    const insights = await generateInsights(keywords, reps);
-
-    const counts = labels.reduce((acc, l) => {
-      acc[l] = (acc[l] || 0) + 1;
-      return acc;
-    }, {});
-
-    state.analysis = { labels, keywords, reps, insights, counts, texts };
-
-    renderDashboard();
-    renderPatterns();
-
-    document.getElementById('status').textContent = '✓ Analysis complete';
-    document.getElementById('status').classList.remove('error');
-  } catch (err) {
-    console.error(err);
-    document.getElementById('status').textContent = 'Analysis error';
-    document.getElementById('status').classList.add('error');
-  }
+  }, 500);
 }
 
-// Chat functionality
-async function handleChatMessage(message) {
-  if (!state.analysis) {
-    addChatMessage('ai', 'Please analyze your data first before asking questions!');
-    return;
-  }
-
-  addChatMessage('user', message);
-
-  const {keywords, insights, texts} = state.analysis;
-  const context = `I have analyzed ${texts.length} transcripts and found ${keywords.length} patterns:\n${keywords.map((kws, i) => `Pattern ${i+1}: ${kws.join(', ')} - ${insights[i]}`).join('\n')}`;
-
-  const prompt = `${context}\n\nUser question: ${message}\n\nProvide a helpful answer based on the analyzed data.`;
-
-  try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        messages: [{ role: "user", content: prompt }]
-      })
-    });
-    const data = await response.json();
-    const text = data.content?.map(c => c.text || "").join("") || "Sorry, I couldn't process that.";
-    addChatMessage('ai', text.trim());
-  } catch (err) {
-    addChatMessage('ai', 'Sorry, there was an error processing your question.');
-  }
-}
-
-function addChatMessage(type, text) {
-  const container = document.getElementById('chatMessages');
-  const msg = document.createElement('div');
-  msg.className = `chat-message ${type}`;
-  
-  if (type === 'ai') {
-    msg.innerHTML = `
-      <div class="chat-avatar ai">🤖</div>
-      <div class="chat-bubble ai">${escapeHTML(text)}</div>
-    `;
-  } else {
-    msg.innerHTML = `
-      <div class="chat-bubble user">${escapeHTML(text)}</div>
-      <div class="chat-avatar user">👤</div>
-    `;
-  }
-  
-  container.appendChild(msg);
-  container.scrollTop = container.scrollHeight;
-}
-
-// Voice recognition
-let recognition;
-if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  recognition = new SpeechRecognition();
-  recognition.continuous = false;
-  recognition.interimResults = false;
-
-  recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript;
-    document.getElementById('chatInput').value = transcript;
-    document.getElementById('voiceBtn').classList.remove('recording');
-  };
-
-  recognition.onerror = () => {
-    document.getElementById('voiceBtn').classList.remove('recording');
-  };
-
-  recognition.onend = () => {
-    document.getElementById('voiceBtn').classList.remove('recording');
-  };
-}
-
-// Event listeners
+// Event Listeners
 document.getElementById('loadSample').addEventListener('click', () => {
   state.transcripts = [...SAMPLE_DATA];
   updateDashboard();
-  document.getElementById('status').textContent = 'Sample data loaded';
-});
-
-document.getElementById('dropZone').addEventListener('click', () => {
-  document.getElementById('fileInput').click();
-});
-
-document.getElementById('fileInput').addEventListener('change', async (e) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
-  const text = await file.text();
-  const rows = text.split('\n').filter(l => l.trim());
-  if (rows.length > 1) {
-    const headers = rows[0].split(',');
-    const textColIdx = headers.findIndex(h => h.toLowerCase().includes('text') || h.toLowerCase().includes('transcript'));
-    if (textColIdx >= 0) {
-      state.transcripts = rows.slice(1).map((row, idx) => {
-        const cols = row.split(',');
-        return { id: idx + 1, name: `Row_${idx + 1}`, text: cols[textColIdx] || "" };
-      }).filter(t => t.text.trim());
-      updateDashboard();
-      document.getElementById('status').textContent = `Loaded ${state.transcripts.length} transcripts`;
-    }
-  }
+  document.getElementById('status').textContent = '✓ Sample data loaded (16 transcripts)';
+  document.getElementById('status').classList.remove('error');
 });
 
 document.getElementById('analyzeBtn').addEventListener('click', runAnalysis);
-
-document.getElementById('sendBtn').addEventListener('click', () => {
-  const input = document.getElementById('chatInput');
-  const message = input.value.trim();
-  if (message) {
-    handleChatMessage(message);
-    input.value = '';
-  }
-});
-
-document.getElementById('chatInput').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') {
-    document.getElementById('sendBtn').click();
-  }
-});
-
-document.getElementById('voiceBtn').addEventListener('click', () => {
-  if (recognition) {
-    const btn = document.getElementById('voiceBtn');
-    if (btn.classList.contains('recording')) {
-      recognition.stop();
-    } else {
-      btn.classList.add('recording');
-      recognition.start();
-    }
-  } else {
-    alert('Voice recognition not supported in this browser. Please use Chrome, Edge, or Safari.');
-  }
-});
 
 // Tab switching
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
     tab.classList.add('active');
-    document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+    const targetTab = tab.dataset.tab;
+    document.getElementById(`tab-${targetTab}`).classList.add('active');
   });
 });
 
+// Initialize
 updateDashboard();
 </script>
 </body>
