@@ -3,17 +3,19 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Learning Signals - Transcript Analysis</title>
+  <title>Learning Signals - AI Transcript Analysis</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root{
-      --bg:#0f1419;
-      --card:#1a1f2e;
-      --text:#e4e8f0;
-      --muted:#8b96a8;
-      --border:rgba(255,255,255,.08);
-      --accent:#5b7cdb;
-      --accent2:#4a9eff;
-      --success:#52c41a;
+      --bg:#0d1117;
+      --card:#161b22;
+      --text:#e6edf3;
+      --muted:#7d8590;
+      --border:rgba(240,246,252,0.1);
+      --accent:#2f81f7;
+      --accent2:#238636;
+      --success:#3fb950;
+      --warning:#d29922;
       --radius:12px;
       --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
@@ -21,87 +23,135 @@
     body{
       font-family:var(--sans);
       color:var(--text);
-      background:linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+      background:var(--bg);
       min-height:100vh;
-      padding:20px 0;
     }
-    .wrap{max-width:1400px;margin:0 auto;padding:0 20px;}
+    .wrap{max-width:1440px;margin:0 auto;}
     
     .header{
+      background:linear-gradient(180deg, #161b22 0%, #0d1117 100%);
+      border-bottom:1px solid var(--border);
+      padding:20px 32px;
+      position:sticky;
+      top:0;
+      z-index:100;
+      backdrop-filter:blur(10px);
+    }
+    .header-content{
       display:flex;
       justify-content:space-between;
       align-items:center;
-      margin-bottom:24px;
-      padding:16px 24px;
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
     }
-    .logo h1{font-size:20px;margin:0;font-weight:600}
-    .logo p{color:var(--muted);font-size:13px;margin-top:4px}
-    .badge{
-      padding:6px 14px;
-      background:rgba(91,124,219,.15);
-      border:1px solid rgba(91,124,219,.3);
-      border-radius:20px;
-      font-size:12px;
-      font-weight:500;
+    .logo{display:flex;align-items:center;gap:12px}
+    .logo-icon{
+      width:36px;
+      height:36px;
+      background:linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius:8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:20px;
+    }
+    .logo-text h1{font-size:20px;margin:0;font-weight:700}
+    .logo-text p{color:var(--muted);font-size:13px;margin-top:2px}
+    .header-tags{display:flex;gap:8px}
+    .tag{
+      padding:6px 12px;
+      background:rgba(47,129,247,.15);
+      border:1px solid rgba(47,129,247,.3);
+      border-radius:16px;
+      font-size:11px;
+      font-weight:600;
       color:var(--accent);
+      text-transform:uppercase;
+      letter-spacing:.5px;
     }
 
-    .main{display:grid;grid-template-columns:320px 1fr;gap:20px;margin-bottom:20px}
+    .main{display:grid;grid-template-columns:340px 1fr;min-height:calc(100vh - 77px)}
     @media(max-width:1200px){ .main{grid-template-columns:1fr} }
     
+    .sidebar{
+      background:var(--card);
+      border-right:1px solid var(--border);
+      padding:24px;
+      overflow-y:auto;
+    }
+
     .card{
       background:var(--card);
       border:1px solid var(--border);
       border-radius:var(--radius);
       padding:20px;
+      margin-bottom:16px;
     }
 
     .section-title{
-      font-size:15px;
+      font-size:14px;
       margin:0 0 16px;
-      padding-bottom:12px;
+      padding-bottom:10px;
       border-bottom:1px solid var(--border);
-      font-weight:600;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      color:var(--muted);
     }
 
-    label{
-      display:block;
+    .kpi-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-bottom:20px;
+    }
+    .kpi-box{
+      padding:16px;
+      background:rgba(47,129,247,.08);
+      border:1px solid rgba(47,129,247,.2);
+      border-radius:10px;
+      text-align:center;
+    }
+    .kpi-num{
+      font-size:32px;
+      font-weight:800;
+      color:var(--accent);
+      margin-bottom:4px;
+    }
+    .kpi-label{
       color:var(--muted);
-      font-size:12px;
-      font-weight:500;
-      margin:14px 0 6px;
+      font-size:11px;
       text-transform:uppercase;
-      letter-spacing:.3px;
+      letter-spacing:.5px;
     }
 
     .btn{
       width:100%;
       padding:12px 18px;
-      margin-top:10px;
+      margin:8px 0;
       border:none;
       border-radius:8px;
       font-weight:600;
       font-size:13px;
       cursor:pointer;
       transition:all .2s;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
     }
     .btn-primary{
       background:var(--accent);
       color:white;
     }
     .btn-primary:hover:not(:disabled){
-      background:#4a68c4;
+      background:#1f6feb;
       transform:translateY(-1px);
     }
-    .btn-secondary{
+    .btn-success{
       background:var(--success);
       color:white;
     }
-    .btn-secondary:hover:not(:disabled){
-      background:#45a816;
+    .btn-success:hover:not(:disabled){
+      background:#2ea043;
       transform:translateY(-1px);
     }
     .btn:disabled{
@@ -109,64 +159,83 @@
       cursor:not-allowed;
     }
 
-    .status{
-      margin-top:12px;
-      padding:10px 12px;
+    .file-drop{
+      border:2px dashed var(--border);
       border-radius:8px;
-      background:rgba(82,196,26,.1);
-      border:1px solid rgba(82,196,26,.2);
-      color:#95de64;
-      font-size:12px;
-      line-height:1.4;
+      padding:32px 20px;
+      text-align:center;
+      cursor:pointer;
+      transition:all .2s;
+      margin:16px 0;
     }
-    .status.error{
-      background:rgba(255,77,79,.1);
-      border:1px solid rgba(255,77,79,.2);
-      color:#ff7875;
+    .file-drop:hover{
+      border-color:var(--accent);
+      background:rgba(47,129,247,.05);
     }
+    .file-drop-icon{font-size:32px;margin-bottom:8px}
+    .file-drop-text{font-size:13px;color:var(--text);margin-bottom:4px}
+    .file-drop-hint{font-size:11px;color:var(--muted)}
 
-    .kpi-grid{
-      display:grid;
-      grid-template-columns:repeat(2, 1fr);
-      gap:10px;
-      margin-bottom:20px;
+    .transcript-list{
+      max-height:280px;
+      overflow-y:auto;
+      margin:16px 0;
     }
-    .kpi-box{
-      padding:16px;
-      background:rgba(0,0,0,.2);
+    .transcript-item{
+      padding:10px;
+      background:rgba(255,255,255,.02);
       border:1px solid var(--border);
       border-radius:8px;
-      text-align:center;
+      margin-bottom:8px;
+      font-size:12px;
     }
-    .kpi-num{
-      font-size:28px;
-      font-weight:700;
-      color:var(--accent2);
+    .transcript-item-name{
+      font-weight:600;
+      color:var(--text);
       margin-bottom:4px;
     }
-    .kpi-label{
+    .transcript-item-meta{
       color:var(--muted);
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.3px;
+      font-size:10px;
+    }
+
+    .status{
+      margin:12px 0;
+      padding:10px 12px;
+      border-radius:8px;
+      background:rgba(63,185,80,.1);
+      border:1px solid rgba(63,185,80,.2);
+      color:var(--success);
+      font-size:12px;
+    }
+    .status.error{
+      background:rgba(248,81,73,.1);
+      border:1px solid rgba(248,81,73,.2);
+      color:#f85149;
+    }
+
+    .content{
+      padding:24px 32px;
+      overflow-y:auto;
+      max-height:calc(100vh - 77px);
     }
 
     .tabs{
       display:flex;
       gap:4px;
-      margin-bottom:16px;
+      margin-bottom:24px;
       border-bottom:1px solid var(--border);
     }
     .tab{
-      padding:10px 18px;
+      padding:12px 20px;
       background:transparent;
       border:none;
       color:var(--muted);
       cursor:pointer;
       border-bottom:2px solid transparent;
       transition:all .2s;
-      font-size:13px;
-      font-weight:500;
+      font-size:14px;
+      font-weight:600;
     }
     .tab.active{
       color:var(--text);
@@ -175,202 +244,279 @@
     .tab-content{display:none}
     .tab-content.active{display:block}
 
-    .transcript-list{
-      max-height:350px;
-      overflow-y:auto;
+    .dashboard-grid{
+      display:grid;
+      grid-template-columns:repeat(4, 1fr);
+      gap:16px;
+      margin-bottom:24px;
     }
-    .transcript-item{
-      padding:12px;
-      background:rgba(0,0,0,.15);
+    @media(max-width:1200px){ .dashboard-grid{grid-template-columns:repeat(2, 1fr)} }
+
+    .stat-card{
+      padding:20px;
+      background:var(--card);
       border:1px solid var(--border);
-      border-radius:8px;
+      border-radius:12px;
+    }
+    .stat-value{
+      font-size:36px;
+      font-weight:800;
+      color:var(--accent);
       margin-bottom:8px;
     }
-    .transcript-name{
-      font-weight:600;
-      font-size:13px;
+    .stat-label{
+      color:var(--muted);
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+    }
+
+    .chart-container{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:20px;
+      margin-bottom:20px;
+    }
+    .chart-title{
+      font-size:16px;
+      font-weight:700;
+      margin-bottom:16px;
       color:var(--text);
-      margin-bottom:4px;
-    }
-    .transcript-preview{
-      font-size:11px;
-      color:var(--muted);
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-    }
-    .transcript-meta{
-      display:flex;
-      justify-content:space-between;
-      margin-top:6px;
-      font-size:10px;
-      color:var(--muted);
     }
 
     .pattern-card{
-      padding:16px;
-      background:rgba(0,0,0,.15);
+      padding:20px;
+      background:var(--card);
       border:1px solid var(--border);
-      border-radius:8px;
-      margin-bottom:14px;
+      border-radius:12px;
+      margin-bottom:16px;
     }
     .pattern-header{
       display:flex;
       justify-content:space-between;
       align-items:center;
-      margin-bottom:10px;
+      margin-bottom:12px;
     }
     .pattern-title{
-      font-size:14px;
-      font-weight:600;
-      color:var(--accent2);
+      font-size:16px;
+      font-weight:700;
+      color:var(--accent);
     }
     .pattern-count{
       font-size:11px;
       color:var(--muted);
       background:rgba(255,255,255,.05);
-      padding:3px 8px;
+      padding:4px 10px;
       border-radius:12px;
     }
     .keywords{
       display:flex;
       flex-wrap:wrap;
-      gap:6px;
-      margin:10px 0;
+      gap:8px;
+      margin:12px 0;
     }
     .keyword{
-      padding:5px 10px;
-      background:rgba(91,124,219,.12);
-      border:1px solid rgba(91,124,219,.25);
-      border-radius:14px;
-      font-size:11px;
-      color:var(--accent2);
+      padding:6px 12px;
+      background:rgba(47,129,247,.12);
+      border:1px solid rgba(47,129,247,.25);
+      border-radius:16px;
+      font-size:12px;
+      color:var(--accent);
     }
 
     .ai-insight{
       margin-top:12px;
-      padding:12px;
-      background:rgba(91,124,219,.08);
+      padding:14px;
+      background:rgba(47,129,247,.08);
       border-left:3px solid var(--accent);
-      border-radius:6px;
+      border-radius:8px;
     }
     .ai-insight-header{
       font-size:11px;
       text-transform:uppercase;
-      letter-spacing:.3px;
+      letter-spacing:.5px;
       color:var(--accent);
-      font-weight:600;
-      margin-bottom:6px;
+      font-weight:700;
+      margin-bottom:8px;
     }
     .ai-insight-content{
       color:var(--text);
-      line-height:1.5;
+      line-height:1.6;
       font-size:13px;
     }
 
     .quote{
-      margin-top:10px;
+      margin-top:12px;
       padding:12px;
-      background:rgba(82,196,26,.08);
+      background:rgba(63,185,80,.08);
       border-left:3px solid var(--success);
-      border-radius:6px;
+      border-radius:8px;
       font-size:12px;
       line-height:1.5;
       font-style:italic;
       color:var(--muted);
     }
 
+    .chat-container{
+      display:flex;
+      flex-direction:column;
+      height:calc(100vh - 200px);
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:12px;
+    }
+    .chat-messages{
+      flex:1;
+      overflow-y:auto;
+      padding:20px;
+    }
+    .chat-message{
+      margin-bottom:16px;
+      display:flex;
+      gap:12px;
+    }
+    .chat-message.user{
+      justify-content:flex-end;
+    }
+    .chat-avatar{
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:16px;
+      flex-shrink:0;
+    }
+    .chat-avatar.ai{
+      background:linear-gradient(135deg, var(--accent), var(--accent2));
+    }
+    .chat-avatar.user{
+      background:linear-gradient(135deg, #d29922, #f0883e);
+    }
+    .chat-bubble{
+      max-width:70%;
+      padding:12px 16px;
+      border-radius:12px;
+      line-height:1.5;
+      font-size:14px;
+    }
+    .chat-bubble.ai{
+      background:rgba(47,129,247,.1);
+      border:1px solid rgba(47,129,247,.2);
+      color:var(--text);
+    }
+    .chat-bubble.user{
+      background:var(--accent);
+      color:white;
+    }
+    .chat-input-container{
+      padding:16px;
+      border-top:1px solid var(--border);
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .chat-input{
+      flex:1;
+      padding:12px 16px;
+      background:rgba(255,255,255,.05);
+      border:1px solid var(--border);
+      border-radius:8px;
+      color:var(--text);
+      font-size:14px;
+      outline:none;
+    }
+    .chat-input:focus{
+      border-color:var(--accent);
+    }
+    .voice-btn{
+      width:44px;
+      height:44px;
+      border:none;
+      background:var(--accent);
+      color:white;
+      border-radius:8px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:18px;
+      transition:all .2s;
+    }
+    .voice-btn:hover{
+      background:#1f6feb;
+    }
+    .voice-btn.recording{
+      background:#f85149;
+      animation:pulse 1s infinite;
+    }
+    @keyframes pulse{
+      0%, 100%{opacity:1}
+      50%{opacity:.5}
+    }
+
+    .empty-state{
+      text-align:center;
+      padding:60px 20px;
+      color:var(--muted);
+    }
+    .empty-icon{font-size:48px;margin-bottom:16px;opacity:.5}
+
     .loading{
       text-align:center;
       padding:40px;
-      color:var(--muted);
     }
     .spinner{
-      border:3px solid rgba(91,124,219,.2);
+      border:3px solid rgba(47,129,247,.2);
       border-top:3px solid var(--accent);
       border-radius:50%;
-      width:36px;
-      height:36px;
+      width:40px;
+      height:40px;
       animation:spin 1s linear infinite;
-      margin:0 auto 14px;
+      margin:0 auto 16px;
     }
     @keyframes spin{
       0%{transform:rotate(0deg)}
       100%{transform:rotate(360deg)}
     }
 
-    .empty-state{
+    .footer{
+      padding:16px 32px;
+      border-top:1px solid var(--border);
       text-align:center;
-      padding:50px 20px;
-      color:var(--muted);
-    }
-
-    .file-drop-zone{
-      border:2px dashed var(--border);
-      border-radius:8px;
-      padding:24px;
-      text-align:center;
-      margin:12px 0;
-      cursor:pointer;
-      transition:all .2s;
-    }
-    .file-drop-zone:hover{
-      border-color:var(--accent);
-      background:rgba(91,124,219,.05);
-    }
-
-    .info-box{
-      margin-top:16px;
-      padding:12px;
-      background:rgba(91,124,219,.08);
-      border:1px solid rgba(91,124,219,.2);
-      border-radius:8px;
-      font-size:12px;
-      line-height:1.5;
-      color:var(--muted);
-    }
-    .info-box strong{color:var(--text)}
-
-    .arch-section{
-      padding:16px;
-      background:rgba(0,0,0,.15);
-      border:1px solid var(--border);
-      border-radius:8px;
-      margin-bottom:14px;
-    }
-    .arch-section h4{
-      color:var(--accent2);
-      font-size:13px;
-      margin-bottom:10px;
-      font-weight:600;
-    }
-    .arch-section ul{
       color:var(--muted);
       font-size:12px;
-      line-height:1.7;
-      list-style:none;
-      padding:0;
     }
-    .arch-section ul li:before{
-      content:"• ";
+    .footer a{
       color:var(--accent);
+      text-decoration:none;
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="header">
-      <div class="logo">
-        <h1>Learning Signals</h1>
-        <p>Educational Transcript Analysis Platform</p>
+      <div class="header-content">
+        <div class="logo">
+          <div class="logo-icon">📊</div>
+          <div class="logo-text">
+            <h1>Learning Signals</h1>
+            <p>AI-Powered Transcript Analysis</p>
+          </div>
+        </div>
+        <div class="header-tags">
+          <span class="tag">Education</span>
+          <span class="tag">Business</span>
+          <span class="tag">Research</span>
+        </div>
       </div>
-      <div class="badge">Research Tool</div>
     </div>
 
     <div class="main">
-      <!-- Sidebar -->
-      <div class="card">
-        <h2 class="section-title">Transcript Library</h2>
+      <div class="sidebar">
+        <div class="section-title">Data Source</div>
 
         <div class="kpi-grid">
           <div class="kpi-box">
@@ -379,111 +525,85 @@
           </div>
           <div class="kpi-box">
             <div class="kpi-num" id="totalWords">0</div>
-            <div class="kpi-label">Total Words</div>
+            <div class="kpi-label">Words</div>
           </div>
         </div>
 
-        <button class="btn btn-secondary" id="loadSample">
-          Load Sample Data (16 transcripts)
+        <button class="btn btn-success" id="loadSample">
+          <span>📝</span> Load Sample Data
         </button>
 
-        <div style="text-align:center;margin:14px 0;color:var(--muted);font-size:12px">or upload CSV</div>
+        <div style="text-align:center;margin:12px 0;color:var(--muted);font-size:12px">or upload your data</div>
 
-        <div class="file-drop-zone" id="dropZone">
-          <div style="font-size:28px;margin-bottom:8px">📁</div>
-          <div style="font-size:13px;color:var(--text);margin-bottom:4px">Drop CSV file here</div>
-          <div style="font-size:11px;color:var(--muted)">or click to browse</div>
+        <div class="file-drop" id="dropZone">
+          <div class="file-drop-icon">📁</div>
+          <div class="file-drop-text">Drop CSV file here</div>
+          <div class="file-drop-hint">or click to browse</div>
           <input type="file" id="fileInput" accept=".csv" style="display:none">
         </div>
 
-        <div class="transcript-list" id="transcriptList">
-          <div class="empty-state" style="padding:28px 10px">
-            <div style="font-size:28px;margin-bottom:8px">📄</div>
-            <p style="font-size:12px">No transcripts loaded</p>
-          </div>
-        </div>
-
-        <button class="btn btn-primary" id="analyzeBtn" disabled style="margin-top:14px">
-          Analyze with AI
+        <button class="btn btn-primary" id="analyzeBtn" disabled>
+          <span>🚀</span> Analyze Data
         </button>
 
-        <div class="status" id="status">
-          Ready to analyze learning data
-        </div>
+        <div class="status" id="status">Ready to analyze</div>
 
-        <div class="info-box">
-          <strong>Method:</strong><br>
-          TF-IDF vectorization → K-means clustering → Claude AI interpretation
+        <div class="section-title" style="margin-top:24px">Recent Transcripts</div>
+        <div class="transcript-list" id="transcriptList">
+          <div class="empty-state" style="padding:20px 10px">
+            <div style="font-size:24px;margin-bottom:8px">📄</div>
+            <p style="font-size:11px">No data loaded</p>
+          </div>
         </div>
       </div>
 
-      <!-- Main Content -->
-      <div class="card">
+      <div class="content">
         <div class="tabs">
-          <button class="tab active" data-tab="analysis">Analysis Results</button>
-          <button class="tab" data-tab="architecture">Production Architecture</button>
+          <button class="tab active" data-tab="dashboard">📊 Dashboard</button>
+          <button class="tab" data-tab="patterns">🔍 Pattern Analysis</button>
+          <button class="tab" data-tab="chat">💬 Ask Questions</button>
         </div>
 
-        <div class="tab-content active" id="tab-analysis">
-          <div id="results">
+        <div class="tab-content active" id="tab-dashboard">
+          <div id="dashboardContent">
             <div class="empty-state">
-              <div style="font-size:42px;margin-bottom:14px">📊</div>
-              <p>Load transcripts and click "Analyze with AI" to discover patterns</p>
+              <div class="empty-icon">📈</div>
+              <h3 style="margin-bottom:8px">No Analysis Yet</h3>
+              <p>Load data and click "Analyze Data" to see insights</p>
             </div>
           </div>
         </div>
 
-        <div class="tab-content" id="tab-architecture">
-          <div style="padding:16px">
-            <h3 style="font-size:18px;margin-bottom:16px;color:var(--accent2);font-weight:600">Production Pipeline for 1,000+ Transcripts</h3>
-            
-            <div style="background:rgba(0,0,0,.2);padding:16px;border-radius:8px;margin-bottom:16px;font-family:monospace;font-size:12px;color:var(--muted);line-height:1.8">
-Voice/Data Input → Batch Ingestion → ETL Pipeline<br>
-&nbsp;&nbsp;&nbsp;&nbsp;↓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
-Transcription&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PostgreSQL + Vector DB<br>
-&nbsp;&nbsp;&nbsp;&nbsp;↓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
-Processing Queue&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Background Jobs<br>
-&nbsp;&nbsp;&nbsp;&nbsp;↓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
-LLM Analysis&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Claude/GPT-4<br>
-&nbsp;&nbsp;&nbsp;&nbsp;↓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
-Dashboard Output&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Research Interface
+        <div class="tab-content" id="tab-patterns">
+          <div id="patternsContent">
+            <div class="empty-state">
+              <div class="empty-icon">🔍</div>
+              <h3 style="margin-bottom:8px">No Patterns Detected</h3>
+              <p>Run analysis to discover themes and patterns</p>
             </div>
+          </div>
+        </div>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
-              <div class="arch-section">
-                <h4>Data Layer</h4>
-                <ul>
-                  <li>PostgreSQL for metadata</li>
-                  <li>Pinecone for embeddings</li>
-                  <li>Redis for caching</li>
-                  <li>S3 for raw files</li>
-                </ul>
-              </div>
-              <div class="arch-section">
-                <h4>Processing</h4>
-                <ul>
-                  <li>Python FastAPI backend</li>
-                  <li>Celery task queue</li>
-                  <li>Batch LLM calls</li>
-                  <li>Async processing</li>
-                </ul>
+        <div class="tab-content" id="tab-chat">
+          <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+              <div class="chat-message">
+                <div class="chat-avatar ai">🤖</div>
+                <div class="chat-bubble ai">
+                  Hello! I'm your AI assistant. Once you've analyzed your data, you can ask me questions like:
+                  <br><br>
+                  • "What are the main themes?"<br>
+                  • "Show me feedback about presentations"<br>
+                  • "What challenges did people face?"<br>
+                  <br>
+                  Type your question or click the microphone to speak!
+                </div>
               </div>
             </div>
-
-            <div class="arch-section">
-              <h4>Scale Estimates (1,200 transcripts)</h4>
-              <div style="color:var(--muted);font-size:12px;line-height:1.7">
-                <strong style="color:var(--text)">Performance:</strong><br>
-                • Ingestion: 2-3 hours for full batch<br>
-                • Embeddings: 1-2 hours (OpenAI ada-002)<br>
-                • LLM Analysis: 3-4 hours (batch processing)<br>
-                • Query Speed: <2s per search<br><br>
-                <strong style="color:var(--text)">Costs:</strong><br>
-                • LLM Processing: ~$150-200 (Claude Sonnet)<br>
-                • Embeddings: ~$5-10 (OpenAI)<br>
-                • Vector DB: ~$70/month (Pinecone)<br>
-                • Infrastructure: ~$50/month (AWS)
-              </div>
+            <div class="chat-input-container">
+              <input type="text" class="chat-input" id="chatInput" placeholder="Ask a question about your data...">
+              <button class="voice-btn" id="voiceBtn" title="Voice input">🎤</button>
+              <button class="btn btn-primary" id="sendBtn" style="width:auto;margin:0;padding:0 20px">Send</button>
             </div>
           </div>
         </div>
@@ -492,11 +612,10 @@ Dashboard Output&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Research Interface
   </div>
 
 <script>
-// Sample data
 const SAMPLE_DATA = [
-  { id: 1, name: "STU001_Interview1", text: "The group project taught me the importance of clear communication. Initially we struggled with coordinating schedules but learned to use shared documents effectively. This experience showed me how proper planning prevents last-minute stress." },
+  { id: 1, name: "STU001_Interview1", text: "The group project taught me the importance of clear communication. Initially we struggled with coordinating schedules but learned to use shared documents effectively." },
   { id: 2, name: "STU001_Interview2", text: "Presenting to the class was nerve-wracking at first. I practiced my delivery multiple times and focused on making eye contact. The feedback helped me understand that pausing for emphasis makes presentations more engaging." },
-  { id: 3, name: "STU002_Interview1", text: "Time management was my biggest challenge this semester. Balancing readings with assignments required better prioritization. I learned to break large tasks into smaller milestones which made everything more manageable." },
+  { id: 3, name: "STU002_Interview1", text: "Time management was my biggest challenge this semester. Balancing readings with assignments required better prioritization. I learned to break large tasks into smaller milestones." },
   { id: 4, name: "STU002_Interview2", text: "The peer review process was valuable for my writing. Receiving constructive criticism helped me see weaknesses I had missed. I now understand that revision is where real improvement happens." },
   { id: 5, name: "STU003_Interview1", text: "Working with diverse team members expanded my perspective. People from different backgrounds approached problems differently. This taught me to listen more carefully before jumping to conclusions." },
   { id: 6, name: "STU003_Interview2", text: "The case study analysis required integrating theory with practice. Reading about concepts is different from applying them to real situations. This bridge between classroom and reality was the most valuable part." },
@@ -504,15 +623,19 @@ const SAMPLE_DATA = [
   { id: 8, name: "STU004_Interview2", text: "Reflective writing pushed me to think metacognitively about learning. Writing down what I learned and how I learned it created deeper understanding. This self-awareness will help in future courses." },
   { id: 9, name: "STU005_Interview1", text: "The iterative feedback loop improved my work significantly. Each round of comments helped me refine my arguments. I realized that good work requires multiple revisions not just one draft." },
   { id: 10, name: "STU005_Interview2", text: "Guest speakers from industry provided real-world context. Their stories illustrated how course concepts translate to professional settings. This connection to careers made the material more motivating." },
-  { id: 11, name: "STU006_Interview1", text: "Discussion forums allowed me to process ideas at my own pace. Reading others' perspectives before contributing helped me formulate clearer thoughts. This format accommodated my thinking style better than in-class debates." },
+  { id: 11, name: "STU006_Interview1", text: "Discussion forums allowed me to process ideas at my own pace. Reading others' perspectives before contributing helped me formulate clearer thoughts." },
   { id: 12, name: "STU006_Interview2", text: "Collaborative problem-solving taught me about group dynamics. Some teammates naturally led while others contributed different skills. Understanding these roles made our collaboration more effective." },
-  { id: 13, name: "STU007_Interview1", text: "The hands-on activities made abstract concepts concrete. Actually doing the work rather than just reading about it created lasting understanding. Experiential learning proved more effective than passive studying." },
-  { id: 14, name: "STU007_Interview2", text: "Building on previous knowledge showed how courses connect. Concepts from earlier classes suddenly made sense in new contexts. This cumulative learning demonstrated education as a journey not isolated subjects." },
-  { id: 15, name: "STU008_Interview1", text: "Setting personal learning goals helped me stay focused. Having clear objectives made it easier to measure progress. I learned that intentional learning is more effective than just going through motions." },
-  { id: 16, name: "STU008_Interview2", text: "The diversity of examples from different industries helped me understand applications. Seeing multiple use cases made theories more accessible and relevant. Context matters for true comprehension." }
+  { id: 13, name: "STU007_Interview1", text: "The hands-on activities made abstract concepts concrete. Actually doing the work rather than just reading about it created lasting understanding." },
+  { id: 14, name: "STU007_Interview2", text: "Building on previous knowledge showed how courses connect. Concepts from earlier classes suddenly made sense in new contexts." },
+  { id: 15, name: "STU008_Interview1", text: "Setting personal learning goals helped me stay focused. Having clear objectives made it easier to measure progress." },
+  { id: 16, name: "STU008_Interview2", text: "The diversity of examples from different industries helped me understand applications. Seeing multiple use cases made theories more accessible and relevant." }
 ];
 
-const state = { transcripts: [] };
+const state = { 
+  transcripts: [], 
+  analysis: null,
+  chartInstances: {}
+};
 
 function updateDashboard() {
   document.getElementById('totalTranscripts').textContent = state.transcripts.length;
@@ -526,45 +649,167 @@ function updateDashboard() {
 function renderTranscriptList() {
   const container = document.getElementById('transcriptList');
   if (state.transcripts.length === 0) {
-    container.innerHTML = '<div class="empty-state" style="padding:28px 10px"><div style="font-size:28px;margin-bottom:8px">📄</div><p style="font-size:12px">No transcripts loaded</p></div>';
+    container.innerHTML = '<div class="empty-state" style="padding:20px 10px"><div style="font-size:24px;margin-bottom:8px">📄</div><p style="font-size:11px">No data loaded</p></div>';
     return;
   }
 
-  container.innerHTML = state.transcripts.map(t => {
-    const preview = t.text.substring(0, 55) + '...';
-    const wordCount = t.text.split(' ').length;
-    return `
-      <div class="transcript-item">
-        <div class="transcript-name">${escapeHTML(t.name)}</div>
-        <div class="transcript-preview">${escapeHTML(preview)}</div>
-        <div class="transcript-meta">
-          <span>${wordCount} words</span>
+  container.innerHTML = state.transcripts.slice(0, 5).map(t => `
+    <div class="transcript-item">
+      <div class="transcript-item-name">${escapeHTML(t.name)}</div>
+      <div class="transcript-item-meta">${t.text.split(' ').length} words</div>
+    </div>
+  `).join('');
+}
+
+function renderDashboard() {
+  const container = document.getElementById('dashboardContent');
+  if (!state.analysis) return;
+
+  const {labels, keywords, counts, texts} = state.analysis;
+
+  // Destroy old charts
+  Object.values(state.chartInstances).forEach(chart => chart.destroy());
+  state.chartInstances = {};
+
+  container.innerHTML = `
+    <div class="dashboard-grid">
+      <div class="stat-card">
+        <div class="stat-value">${texts.length}</div>
+        <div class="stat-label">Total Transcripts</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${keywords.length}</div>
+        <div class="stat-label">Patterns Found</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${keywords.flat().length}</div>
+        <div class="stat-label">Keywords Extracted</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${texts.reduce((s,t)=>s+t.split(' ').length,0)}</div>
+        <div class="stat-label">Total Words</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px">
+      <div class="chart-container">
+        <div class="chart-title">Pattern Distribution</div>
+        <canvas id="barChart" height="100"></canvas>
+      </div>
+      <div class="chart-container">
+        <div class="chart-title">Transcript Breakdown</div>
+        <canvas id="pieChart"></canvas>
+      </div>
+    </div>
+  `;
+
+  // Bar chart
+  const barCtx = document.getElementById('barChart').getContext('2d');
+  state.chartInstances.bar = new Chart(barCtx, {
+    type: 'bar',
+    data: {
+      labels: keywords.map((_, i) => `Pattern ${i + 1}`),
+      datasets: [{
+        label: 'Number of Transcripts',
+        data: Object.values(counts),
+        backgroundColor: 'rgba(47, 129, 247, 0.6)',
+        borderColor: 'rgba(47, 129, 247, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { color: '#7d8590' },
+          grid: { color: 'rgba(240,246,252,0.05)' }
+        },
+        x: {
+          ticks: { color: '#7d8590' },
+          grid: { color: 'rgba(240,246,252,0.05)' }
+        }
+      }
+    }
+  });
+
+  // Pie chart
+  const pieCtx = document.getElementById('pieChart').getContext('2d');
+  state.chartInstances.pie = new Chart(pieCtx, {
+    type: 'doughnut',
+    data: {
+      labels: keywords.map((_, i) => `Pattern ${i + 1}`),
+      datasets: [{
+        data: Object.values(counts),
+        backgroundColor: [
+          'rgba(47, 129, 247, 0.8)',
+          'rgba(63, 185, 80, 0.8)',
+          'rgba(210, 153, 34, 0.8)',
+          'rgba(240, 136, 62, 0.8)'
+        ],
+        borderWidth: 2,
+        borderColor: '#161b22'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: '#7d8590', padding: 10 }
+        }
+      }
+    }
+  });
+}
+
+function renderPatterns() {
+  const container = document.getElementById('patternsContent');
+  if (!state.analysis) return;
+
+  const {keywords, insights, reps, counts} = state.analysis;
+
+  let html = '';
+  for (let i = 0; i < keywords.length; i++) {
+    html += `
+      <div class="pattern-card">
+        <div class="pattern-header">
+          <div class="pattern-title">Pattern ${i + 1}</div>
+          <div class="pattern-count">${counts[i] || 0} transcripts</div>
         </div>
+        
+        <div class="keywords">
+          ${keywords[i].map(kw => `<span class="keyword">${escapeHTML(kw)}</span>`).join("")}
+        </div>
+
+        <div class="ai-insight">
+          <div class="ai-insight-header">🤖 AI Interpretation</div>
+          <div class="ai-insight-content">${escapeHTML(insights[i])}</div>
+        </div>
+
+        ${(reps[i] || []).map(q => `
+          <div class="quote">"${escapeHTML(q)}"</div>
+        `).join("")}
       </div>
     `;
-  }).join('');
+  }
+
+  container.innerHTML = html;
 }
 
 // Analysis functions
 function cleanText(s) {
-  return String(s || "")
-    .toLowerCase()
-    .replace(/https?:\/\/\S+/g, " ")
-    .replace(/[^a-z0-9\s']/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  return String(s || "").toLowerCase().replace(/https?:\/\/\S+/g, " ").replace(/[^a-z0-9\s']/g, " ").replace(/\s+/g, " ").trim();
 }
 
 function tokenize(s) {
-  const stop = new Set([
-    "the", "a", "an", "and", "or", "but", "if", "then", "else", "when", "while", "to", "of", "in", "on", "for", "with", "as", "at", "by",
-    "is", "are", "was", "were", "be", "been", "being", "it", "this", "that", "these", "those", "i", "we", "you", "they", "he", "she", "my",
-    "our", "your", "their", "me", "us", "him", "her", "them", "from", "into", "about", "over", "under", "again", "very", "really", "just",
-    "so", "because", "can", "could", "should", "would", "will", "did", "do", "does", "done", "than", "too", "also", "not"
-  ]);
-  return s.split(" ")
-    .map(t => t.trim())
-    .filter(t => t.length >= 3 && !stop.has(t));
+  const stop = new Set(["the","a","an","and","or","but","if","then","else","when","while","to","of","in","on","for","with","as","at","by","is","are","was","were","be","been","being","it","this","that","these","those","i","we","you","they","he","she","my","our","your","their","me","us","him","her","them","from","into","about","over","under","again","very","really","just","so","because","can","could","should","would","will","did","do","does","done","than","too","also","not"]);
+  return s.split(" ").map(t => t.trim()).filter(t => t.length >= 3 && !stop.has(t));
 }
 
 function buildVocab(docs) {
@@ -576,13 +821,7 @@ function buildVocab(docs) {
     uniq.forEach(t => df.set(t, (df.get(t) || 0) + 1));
     tdocs.push(toks);
   });
-
-  const terms = [...df.entries()]
-    .filter(([t, c]) => c >= 1)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 2500)
-    .map(([t]) => t);
-
+  const terms = [...df.entries()].filter(([t, c]) => c >= 1).sort((a, b) => b[1] - a[1]).slice(0, 2500).map(([t]) => t);
   const idx = new Map();
   terms.forEach((t, i) => idx.set(t, i));
   return { terms, idx, tdocs };
@@ -591,7 +830,6 @@ function buildVocab(docs) {
 function tfidfMatrix(tdocs, terms, idx) {
   const N = tdocs.length;
   const df = new Array(terms.length).fill(0);
-
   const tf = tdocs.map(toks => {
     const counts = new Map();
     toks.forEach(t => {
@@ -600,9 +838,7 @@ function tfidfMatrix(tdocs, terms, idx) {
     counts.forEach((v, t) => { df[idx.get(t)] += 1; });
     return counts;
   });
-
   const idf = df.map(dfi => Math.log((N + 1) / (dfi + 1)) + 1);
-
   const X = tf.map(counts => {
     const vec = new Array(terms.length).fill(0);
     counts.forEach((v, t) => {
@@ -613,7 +849,6 @@ function tfidfMatrix(tdocs, terms, idx) {
     for (let j = 0; j < vec.length; j++) vec[j] /= norm;
     return vec;
   });
-
   return { X };
 }
 
@@ -626,7 +861,6 @@ function cosineDistance(a, b) {
 function kmeans(X, k, iters = 25) {
   const n = X.length;
   const d = X[0].length;
-
   const idxs = [...Array(n).keys()];
   for (let i = idxs.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -634,7 +868,6 @@ function kmeans(X, k, iters = 25) {
   }
   let centers = idxs.slice(0, k).map(i => X[i].slice());
   let labels = new Array(n).fill(0);
-
   for (let it = 0; it < iters; it++) {
     let changed = false;
     for (let i = 0; i < n; i++) {
@@ -690,19 +923,10 @@ function representativeQuotes(X, labels, centers, texts, perCluster) {
 
 async function generateInsights(keywords, quotes) {
   const insights = [];
-  
   for (let i = 0; i < keywords.length; i++) {
     const kw = keywords[i];
     const q = quotes[i] || [];
-    
-    const prompt = `You are an educational researcher analyzing learning data.
-
-Pattern ${i + 1} keywords: ${kw.join(", ")}
-Sample quotes:
-${q.map((qt, idx) => `${idx + 1}. "${qt}"`).join("\n")}
-
-Provide a brief 2-3 sentence interpretation of the educational theme this pattern reveals.`;
-
+    const prompt = `You are analyzing transcript data. Pattern ${i + 1} has keywords: ${kw.join(", ")}. Sample quotes: ${q.map((qt, idx) => `${idx + 1}. "${qt}"`).join("\n")}. Provide a brief 2-3 sentence interpretation of the theme this pattern reveals.`;
     try {
       const response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
@@ -713,38 +937,32 @@ Provide a brief 2-3 sentence interpretation of the educational theme this patter
           messages: [{ role: "user", content: prompt }]
         })
       });
-
       const data = await response.json();
       const text = data.content?.map(c => c.text || "").join("") || "Analysis unavailable";
       insights.push(text.trim());
     } catch (err) {
-      console.error("AI error:", err);
-      insights.push("Pattern analysis: " + kw.slice(0, 3).join(", ") + " and related themes");
+      insights.push("Pattern focuses on: " + kw.slice(0, 3).join(", "));
     }
   }
-  
   return insights;
 }
 
 function escapeHTML(str) {
-  return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
+  return String(str).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 }
 
 async function runAnalysis() {
   const texts = state.transcripts.map(t => t.text);
   const k = Math.min(3, Math.max(2, Math.floor(texts.length / 5)));
 
-  const container = document.getElementById('results');
-  container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Analyzing ' + texts.length + ' transcripts...</p></div>';
+  document.getElementById('status').textContent = 'Analyzing...';
+  document.getElementById('dashboardContent').innerHTML = '<div class="loading"><div class="spinner"></div><p>Analyzing data...</p></div>';
 
   try {
     const { terms, idx, tdocs } = buildVocab(texts);
     if (terms.length < 5) {
-      container.innerHTML = '<div class="empty-state"><p>Not enough text data</p></div>';
+      document.getElementById('status').textContent = 'Not enough data';
+      document.getElementById('status').classList.add('error');
       return;
     }
 
@@ -752,7 +970,6 @@ async function runAnalysis() {
     const { labels, centers } = kmeans(X, k, 25);
     const keywords = topKeywordsForCluster(centers, terms, 6);
     const reps = representativeQuotes(X, labels, centers, texts, 2);
-
     const insights = await generateInsights(keywords, reps);
 
     const counts = labels.reduce((acc, l) => {
@@ -760,66 +977,101 @@ async function runAnalysis() {
       return acc;
     }, {});
 
-    let html = `
-      <div class="kpi-grid" style="grid-template-columns:repeat(4, 1fr);margin-bottom:20px">
-        <div class="kpi-box">
-          <div class="kpi-num">${texts.length}</div>
-          <div class="kpi-label">Transcripts</div>
-        </div>
-        <div class="kpi-box">
-          <div class="kpi-num">${k}</div>
-          <div class="kpi-label">Patterns</div>
-        </div>
-        <div class="kpi-box">
-          <div class="kpi-num">${keywords[0].length * k}</div>
-          <div class="kpi-label">Keywords</div>
-        </div>
-        <div class="kpi-box">
-          <div class="kpi-num">${texts.reduce((s, t) => s + t.split(' ').length, 0).toLocaleString()}</div>
-          <div class="kpi-label">Words</div>
-        </div>
-      </div>
-    `;
+    state.analysis = { labels, keywords, reps, insights, counts, texts };
 
-    for (let c = 0; c < k; c++) {
-      html += `
-        <div class="pattern-card">
-          <div class="pattern-header">
-            <div class="pattern-title">Pattern ${c + 1}</div>
-            <div class="pattern-count">${counts[c] || 0} transcripts</div>
-          </div>
-          
-          <div class="keywords">
-            ${keywords[c].map(kw => `<span class="keyword">${escapeHTML(kw)}</span>`).join("")}
-          </div>
+    renderDashboard();
+    renderPatterns();
 
-          <div class="ai-insight">
-            <div class="ai-insight-header">AI Interpretation</div>
-            <div class="ai-insight-content">${escapeHTML(insights[c])}</div>
-          </div>
-
-          ${(reps[c] || []).map(q => `
-            <div class="quote">"${escapeHTML(q)}"</div>
-          `).join("")}
-        </div>
-      `;
-    }
-
-    container.innerHTML = html;
     document.getElementById('status').textContent = '✓ Analysis complete';
+    document.getElementById('status').classList.remove('error');
   } catch (err) {
     console.error(err);
-    container.innerHTML = '<div class="empty-state"><p>Analysis error</p></div>';
-    document.getElementById('status').textContent = 'Error during analysis';
+    document.getElementById('status').textContent = 'Analysis error';
     document.getElementById('status').classList.add('error');
   }
+}
+
+// Chat functionality
+async function handleChatMessage(message) {
+  if (!state.analysis) {
+    addChatMessage('ai', 'Please analyze your data first before asking questions!');
+    return;
+  }
+
+  addChatMessage('user', message);
+
+  const {keywords, insights, texts} = state.analysis;
+  const context = `I have analyzed ${texts.length} transcripts and found ${keywords.length} patterns:\n${keywords.map((kws, i) => `Pattern ${i+1}: ${kws.join(', ')} - ${insights[i]}`).join('\n')}`;
+
+  const prompt = `${context}\n\nUser question: ${message}\n\nProvide a helpful answer based on the analyzed data.`;
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    const data = await response.json();
+    const text = data.content?.map(c => c.text || "").join("") || "Sorry, I couldn't process that.";
+    addChatMessage('ai', text.trim());
+  } catch (err) {
+    addChatMessage('ai', 'Sorry, there was an error processing your question.');
+  }
+}
+
+function addChatMessage(type, text) {
+  const container = document.getElementById('chatMessages');
+  const msg = document.createElement('div');
+  msg.className = `chat-message ${type}`;
+  
+  if (type === 'ai') {
+    msg.innerHTML = `
+      <div class="chat-avatar ai">🤖</div>
+      <div class="chat-bubble ai">${escapeHTML(text)}</div>
+    `;
+  } else {
+    msg.innerHTML = `
+      <div class="chat-bubble user">${escapeHTML(text)}</div>
+      <div class="chat-avatar user">👤</div>
+    `;
+  }
+  
+  container.appendChild(msg);
+  container.scrollTop = container.scrollHeight;
+}
+
+// Voice recognition
+let recognition;
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    document.getElementById('chatInput').value = transcript;
+    document.getElementById('voiceBtn').classList.remove('recording');
+  };
+
+  recognition.onerror = () => {
+    document.getElementById('voiceBtn').classList.remove('recording');
+  };
+
+  recognition.onend = () => {
+    document.getElementById('voiceBtn').classList.remove('recording');
+  };
 }
 
 // Event listeners
 document.getElementById('loadSample').addEventListener('click', () => {
   state.transcripts = [...SAMPLE_DATA];
   updateDashboard();
-  document.getElementById('status').textContent = 'Loaded 16 sample transcripts';
+  document.getElementById('status').textContent = 'Sample data loaded';
 });
 
 document.getElementById('dropZone').addEventListener('click', () => {
@@ -829,24 +1081,16 @@ document.getElementById('dropZone').addEventListener('click', () => {
 document.getElementById('fileInput').addEventListener('change', async (e) => {
   const file = e.target.files?.[0];
   if (!file) return;
-  
   const text = await file.text();
   const rows = text.split('\n').filter(l => l.trim());
-  
   if (rows.length > 1) {
     const headers = rows[0].split(',');
     const textColIdx = headers.findIndex(h => h.toLowerCase().includes('text') || h.toLowerCase().includes('transcript'));
-    
     if (textColIdx >= 0) {
       state.transcripts = rows.slice(1).map((row, idx) => {
         const cols = row.split(',');
-        return {
-          id: idx + 1,
-          name: `Row_${idx + 1}`,
-          text: cols[textColIdx] || ""
-        };
+        return { id: idx + 1, name: `Row_${idx + 1}`, text: cols[textColIdx] || "" };
       }).filter(t => t.text.trim());
-      
       updateDashboard();
       document.getElementById('status').textContent = `Loaded ${state.transcripts.length} transcripts`;
     }
@@ -855,15 +1099,42 @@ document.getElementById('fileInput').addEventListener('change', async (e) => {
 
 document.getElementById('analyzeBtn').addEventListener('click', runAnalysis);
 
+document.getElementById('sendBtn').addEventListener('click', () => {
+  const input = document.getElementById('chatInput');
+  const message = input.value.trim();
+  if (message) {
+    handleChatMessage(message);
+    input.value = '';
+  }
+});
+
+document.getElementById('chatInput').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    document.getElementById('sendBtn').click();
+  }
+});
+
+document.getElementById('voiceBtn').addEventListener('click', () => {
+  if (recognition) {
+    const btn = document.getElementById('voiceBtn');
+    if (btn.classList.contains('recording')) {
+      recognition.stop();
+    } else {
+      btn.classList.add('recording');
+      recognition.start();
+    }
+  } else {
+    alert('Voice recognition not supported in this browser. Please use Chrome, Edge, or Safari.');
+  }
+});
+
 // Tab switching
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    
     tab.classList.add('active');
-    const target = tab.dataset.tab;
-    document.getElementById(`tab-${target}`).classList.add('active');
+    document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
   });
 });
 
